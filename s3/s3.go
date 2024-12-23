@@ -268,3 +268,22 @@ func (s *Mod) GetPath(url string) (filePath string) {
 
 	return url[len(get+bucketName)+1:]
 }
+
+// 复制文件
+func (s *Mod) CopyObject(bucketName string, dstStr string, srcStr string) (err error) {
+
+	// 原始文件
+	var dst = minio.CopyDestOptions{
+		Bucket: dstStr,
+		Object: bucketName,
+	}
+
+	// 新文件
+	var src = minio.CopySrcOptions{
+		Bucket: srcStr,
+		Object: bucketName,
+	}
+
+	_, err = s.client.CopyObject(ctx, dst, src)
+	return
+}
