@@ -21,7 +21,7 @@ type F64CountRank struct {
 	updateTs string // 更新时间key
 }
 
-type Info struct {
+type Data struct {
 	Id       int64
 	Score    int64
 	Rank     int32
@@ -269,7 +269,7 @@ func (r *F64CountRank) UpdateScore(id int64, score int64) (err error) {
 //}
 
 // GetRankInfosNotTs 获取0~count跳记录 不根据更新时间来
-func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*Info, err error) {
+func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*Data, err error) {
 	var members []int64
 	get, err := g.Redis().ZRange(ctx, r.name, int64(offset), int64(count),
 		gredis.ZRangeOption{
@@ -281,7 +281,7 @@ func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*Info, err e
 		return
 	}
 
-	list = make([]*Info, len(members))
+	list = make([]*Data, len(members))
 	for i := range members {
 		id := members[i]
 		//id := pgk.InterfaceToNumber[uint64](members[i])
@@ -291,8 +291,8 @@ func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*Info, err e
 }
 
 // 获取指定id的当前排名
-func (r *F64CountRank) GetIdRankNotTs(id int64) (rankInfo *Info) {
-	rankInfo = &Info{Id: id}
+func (r *F64CountRank) GetIdRankNotTs(id int64) (rankInfo *Data) {
+	rankInfo = &Data{Id: id}
 	score, err := g.Redis().ZScore(ctx, r.name, id)
 	if err != nil {
 		return

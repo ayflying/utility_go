@@ -1,7 +1,6 @@
 package aycache
 
 import (
-	"github.com/ayflying/utility_go/ayCache/drive"
 	"github.com/gogf/gf/v2/os/gcache"
 )
 
@@ -22,9 +21,9 @@ func New(_name ...string) gcache.Adapter {
 	}
 	switch name {
 	case "cache":
-		cacheAdapterObj = drive.NewAdapterMemory()
+		cacheAdapterObj = NewAdapterMemory()
 	case "redis":
-		cacheAdapterObj = drive.NewAdapterRedis()
+		cacheAdapterObj = NewAdapterRedis()
 	}
 
 	//var client = gcache.New()
