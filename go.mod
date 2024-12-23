@@ -3,6 +3,7 @@ module github.com/ayflying/utility_go
 go 1.23.0
 
 require (
+	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/ayflying/excel2json v1.1.2
 	github.com/gogf/gf/v2 v2.8.3
 	github.com/minio/minio-go/v7 v7.0.82
