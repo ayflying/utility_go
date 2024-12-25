@@ -72,6 +72,9 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 
 // 获取阿波罗
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
+	c.Lock.Lock()
+	defer c.Lock.Unlock()
+
 	Item2Obj[name+".json"] = obj
 	var cfg = config.AppConfig{
 		AppID:             ApolloCfg.AppID,
