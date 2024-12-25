@@ -11,7 +11,9 @@ import (
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gres"
 	"github.com/gogf/gf/v2/text/gstr"
+	"path"
 	"sync"
+	"time"
 )
 
 var (
@@ -22,10 +24,11 @@ var (
 
 // load接口定义了Load方法，用于加载数据
 type Load interface {
-	Load()
+	Load(cfg ...string)
 }
 
 type Cfg struct {
+	Lock sync.Mutex
 }
 
 func (c *Cfg) GetDbFile(name string) (res *g.Var, err error) {
@@ -69,25 +72,49 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 
 // 获取阿波罗
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
-	Item2Obj[name] = obj
+	c.Lock.Lock()
+	defer c.Lock.Unlock()
 
-	//c2 := &config.AppConfig{
-	//	AppID:          consts.ApolloAppID,
-	//	Cluster:        consts.ApolloCluster,
-	//	IP:             consts.ApolloIP,
-	//	NamespaceName:  consts.ApolloNamespaceName,
-	//	IsBackupConfig: consts.ApolloIsBackupConfig,
-	//	Secret:         consts.ApolloSecret,
-	//}
+	Item2Obj[name+".json"] = obj
+	var cfg = config.AppConfig{
+		AppID:             ApolloCfg.AppID,
+		Cluster:           ApolloCfg.Cluster,
+		IP:                ApolloCfg.IP,
+		NamespaceName:     name + ".json",
+		Secret:            ApolloCfg.Secret,
+		IsBackupConfig:    ApolloCfg.IsBackupConfig,
+		BackupConfigPath:  ApolloCfg.BackupConfigPath,
+		SyncServerTimeout: 60,
+		MustStart:         true,
+	}
+	//cfg.NamespaceName = name + ".json"
 
 	client, err := agollo.StartWithConfig(func() (*config.AppConfig, error) {
 		return ApolloCfg, nil
 	})
+	if client == nil {
+		return
+	}
+	var getStr string
+	var getApollo *storage.Config
+	for range 10 {
+		getApollo = client.GetConfig(cfg.NamespaceName)
+		if getApollo != nil {
+			break
+		}
+		time.Sleep(time.Second * 5)
+	}
 
-	get := client.GetConfigCache(ApolloCfg.NamespaceName)
-	getStr, err := get.Get("content")
+	if getApollo != nil {
+		getStr = getApollo.GetValue("content")
+		if getStr != "" {
+			//写入配置
+			gfile.PutContents(path.Join("manifest", "game", name+".json"), getStr)
+		}
+	} else {
+		jsonObj, err = c.GetFile(name)
+	}
 	jsonObj, err = gjson.DecodeToJson(getStr)
-
 	//首次运行加入监听器
 	if !gstr.InArray(ApolloListener, name) {
 		c2 := &CustomChangeListener{}
@@ -115,16 +142,9 @@ func (c *CustomChangeListener) OnChange(changeEvent *storage.ChangeEvent) {
 	g.Log().Debugf(nil, "当前Namespace变化了：%v", changeEvent.Namespace)
 	filename := changeEvent.Namespace
 	if obj, ok := Item2Obj[filename]; ok {
-		obj.Load()
+		//重载配置文件
+		obj.Load(changeEvent.Changes["content"].NewValue.(string))
 	}
-
-	//cfgList := consts.ExcelFileList
-	//for _, v := range cfgList {
-	//	if v.Name == changeEvent.Namespace {
-	//
-	//	}
-	//}
-
 }
 
 func (c *CustomChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
