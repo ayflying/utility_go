@@ -3,21 +3,21 @@ package config
 import (
 	"fmt"
 	"github.com/apolloconfig/agollo/v4"
-	"github.com/apolloconfig/agollo/v4/env/config"
+	apolloConfig "github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/apolloconfig/agollo/v4/storage"
+	"github.com/gogf/gf/contrib/config/apollo/v2"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gres"
 	"github.com/gogf/gf/v2/text/gstr"
-	"path"
 	"sync"
-	"time"
 )
 
 var (
-	ApolloCfg      *config.AppConfig
+	//ApolloCfg      *apolloConfig.AppConfig
+	ApolloCfg      *apollo.Config
 	ApolloListener []string
 	Item2Obj       = map[string]Load{}
 )
@@ -71,57 +71,95 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 }
 
 // 获取阿波罗
+//func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
+//	jsonObj, err = c.GetApolloV2(name, obj)
+//	return
+//
+//	//c.Lock.Lock()
+//	//defer c.Lock.Unlock()
+//	//
+//	//Item2Obj[name+".json"] = obj
+//	//var cfg = apolloConfig.AppConfig{
+//	//	AppID:             ApolloCfg.AppID,
+//	//	Cluster:           ApolloCfg.Cluster,
+//	//	IP:                ApolloCfg.IP,
+//	//	NamespaceName:     name + ".json",
+//	//	Secret:            ApolloCfg.Secret,
+//	//	IsBackupConfig:    ApolloCfg.IsBackupConfig,
+//	//	BackupConfigPath:  ApolloCfg.BackupConfigPath,
+//	//	SyncServerTimeout: 60,
+//	//	MustStart:         true,
+//	//}
+//	////cfg.NamespaceName = name + ".json"
+//	//
+//	//client, err := agollo.StartWithConfig(func() (*apolloConfig.AppConfig, error) {
+//	//	return ApolloCfg, nil
+//	//})
+//	//if client == nil {
+//	//	return
+//	//}
+//	//var getStr string
+//	//var getApollo *storage.Config
+//	//for range 5 {
+//	//	getApollo = client.GetConfig(cfg.NamespaceName)
+//	//	if getApollo != nil {
+//	//		break
+//	//	}
+//	//	time.Sleep(time.Second * 5)
+//	//}
+//	//
+//	//if getApollo != nil {
+//	//	getStr = getApollo.GetValue("content")
+//	//	if getStr != "" {
+//	//		//写入配置
+//	//		gfile.PutContents(path.Join("manifest", "game", name+".json"), getStr)
+//	//	}
+//	//} else {
+//	//	jsonObj, err = c.GetFile(name)
+//	//}
+//	//jsonObj, err = gjson.DecodeToJson(getStr)
+//	////首次运行加入监听器
+//	//if !gstr.InArray(ApolloListener, name) {
+//	//	c2 := &CustomChangeListener{}
+//	//	client.AddChangeListener(c2)
+//	//	ApolloListener = append(ApolloListener, name)
+//	//}
+//	//return
+//}
+
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
-	c.Lock.Lock()
-	defer c.Lock.Unlock()
+	// 接入阿波罗配置
+	ApolloCfg.NamespaceName = name + ".json"
+	adapter, err := apollo.New(nil, *ApolloCfg)
+	if err != nil {
+		g.Log().Fatalf(nil, `%+v`, err)
+	}
+	// Change the adapter of default configuration instance.
+	g.Cfg(name).SetAdapter(adapter)
 
-	Item2Obj[name+".json"] = obj
-	var cfg = config.AppConfig{
-		AppID:             ApolloCfg.AppID,
-		Cluster:           ApolloCfg.Cluster,
-		IP:                ApolloCfg.IP,
-		NamespaceName:     name + ".json",
-		Secret:            ApolloCfg.Secret,
-		IsBackupConfig:    ApolloCfg.IsBackupConfig,
-		BackupConfigPath:  ApolloCfg.BackupConfigPath,
-		SyncServerTimeout: 60,
-		MustStart:         true,
-	}
-	//cfg.NamespaceName = name + ".json"
-
-	client, err := agollo.StartWithConfig(func() (*config.AppConfig, error) {
-		return ApolloCfg, nil
-	})
-	if client == nil {
-		return
-	}
-	var getStr string
-	var getApollo *storage.Config
-	for range 10 {
-		getApollo = client.GetConfig(cfg.NamespaceName)
-		if getApollo != nil {
-			break
-		}
-		time.Sleep(time.Second * 5)
-	}
-
-	if getApollo != nil {
-		getStr = getApollo.GetValue("content")
-		if getStr != "" {
-			//写入配置
-			gfile.PutContents(path.Join("manifest", "game", name+".json"), getStr)
-		}
-	} else {
-		jsonObj, err = c.GetFile(name)
-	}
-	jsonObj, err = gjson.DecodeToJson(getStr)
 	//首次运行加入监听器
 	if !gstr.InArray(ApolloListener, name) {
+		//放置监听器
+		client, _ := agollo.StartWithConfig(func() (*apolloConfig.AppConfig, error) {
+			return &apolloConfig.AppConfig{
+				AppID:             ApolloCfg.AppID,
+				Cluster:           ApolloCfg.Cluster,
+				NamespaceName:     ApolloCfg.NamespaceName,
+				IP:                ApolloCfg.IP,
+				IsBackupConfig:    ApolloCfg.IsBackupConfig,
+				BackupConfigPath:  ApolloCfg.BackupConfigPath,
+				Secret:            ApolloCfg.Secret,
+				SyncServerTimeout: ApolloCfg.SyncServerTimeout,
+				MustStart:         ApolloCfg.MustStart,
+			}, nil
+		})
 		c2 := &CustomChangeListener{}
 		client.AddChangeListener(c2)
-		ApolloListener = append(ApolloListener, name)
+		ApolloListener = append(ApolloListener, name+".json")
 	}
 
+	cfg, err := g.Cfg(name).Get(nil, "content")
+	cfg.Scan(&jsonObj)
 	return
 }
 
@@ -132,7 +170,7 @@ type CustomChangeListener struct {
 
 func (c *CustomChangeListener) OnChange(changeEvent *storage.ChangeEvent) {
 	//write your code here
-	fmt.Println(changeEvent.Changes)
+	//fmt.Println(changeEvent.Changes)
 	//for key, value := range changeEvent.Changes {
 	//	fmt.Println("change key : ", key, ", value :", value)
 	//}

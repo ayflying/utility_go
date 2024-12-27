@@ -94,7 +94,6 @@ func (s *Excel) itemsFormat(list []interface{}, Items []string) []interface{} {
 			if gstr.InArray(Items, k3) {
 				if _, ok := v3.(string); ok {
 					list[k2].(g.Map)[k3] = s.Spilt2Item(v3.(string))
-
 				} else {
 					g.Log().Errorf(gctx.New(), "当前类型断言失败:%v,list=%v", v3, v2)
 				}

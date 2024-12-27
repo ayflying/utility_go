@@ -27,7 +27,19 @@ func Excel2Slice(filePath string, _sheet ...string) [][]string {
 
 // 字符串转道具类型
 func (s *Excel) Spilt2Item(str string) (result [][]int64) {
-	parts := strings.Split(str, "|") // 分割字符串
+	var parts []string
+	parts1 := strings.Split(str, "|") // 分割字符串
+	if parts1 == nil {
+		parts1 = []string{str}
+	}
+	for _, v := range parts1 {
+		parts2 := strings.Split(v, ",") // 分割字符串
+		if parts2 == nil {
+			parts = append(parts, v)
+		} else {
+			parts = append(parts, parts2...)
+		}
+	}
 
 	for i := 0; i < len(parts)-1; i += 2 {
 		num1, _ := strconv.ParseInt(parts[i], 10, 64)

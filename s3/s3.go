@@ -45,6 +45,8 @@ func New(_name ...string) *Mod {
 		name = getName.String()
 	}
 
+	get2, err := g.Cfg().Get(ctx, "s3")
+	g.Dump(get2)
 	get, err := g.Cfg().Get(ctx, "s3."+name)
 	if err != nil {
 		panic(err.Error())
