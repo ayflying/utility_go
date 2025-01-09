@@ -128,6 +128,8 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 //}
 
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
+	Item2Obj[name+".json"] = obj
+
 	// 接入阿波罗配置
 	ApolloCfg.NamespaceName = name + ".json"
 	adapter, err := apollo.New(nil, *ApolloCfg)
@@ -169,14 +171,6 @@ type CustomChangeListener struct {
 }
 
 func (c *CustomChangeListener) OnChange(changeEvent *storage.ChangeEvent) {
-	//write your code here
-	//fmt.Println(changeEvent.Changes)
-	//for key, value := range changeEvent.Changes {
-	//	fmt.Println("change key : ", key, ", value :", value)
-	//}
-	//fmt.Println(changeEvent.Namespace)
-	//c.wg.Done()
-
 	g.Log().Debugf(nil, "当前Namespace变化了：%v", changeEvent.Namespace)
 	filename := changeEvent.Namespace
 	if obj, ok := Item2Obj[filename]; ok {
