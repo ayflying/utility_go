@@ -1,12 +1,9 @@
 package tools
 
 import (
-	bagV1 "game_server/api/bag/v1"
-	v1 "game_server/api/bag/v1"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -88,53 +85,6 @@ func (m *tools) Items2Map(items [][]int64) (list map[int64]int64) {
 	for _, v := range items {
 		list[v[0]] = v[1]
 	}
-	return
-}
-
-// 道具转Pb
-func (m *tools) Items2Pb(items [][]int64) (list map[int64]*v1.Item) {
-	list = make(map[int64]*v1.Item)
-	for _, v := range items {
-		list[v[0]] = &v1.Item{
-			Count: v[1],
-		}
-	}
-	return list
-}
-
-// UpdateItems 格式化到items输出
-func (m *tools) UpdateItems(items [][]int64, updateItems [][]int64, IsDeduct ...bool) (data *bagV1.ItemUpdate) {
-	data = &bagV1.ItemUpdate{
-		Items:       make(map[int64]*bagV1.Item),
-		UpdateItems: make(map[int64]*bagV1.Item),
-	}
-
-	for _, v := range items {
-		if _, ok := data.Items[v[0]]; ok {
-			//如果存在，追加数据
-			data.Items[v[0]].Count += v[1]
-		} else {
-			//如果不存在，创建数据
-			data.Items[v[0]] = &bagV1.Item{
-				Count: v[1],
-			}
-		}
-	}
-
-	for _, v := range updateItems {
-		//UpdateItems 只保存最新的值
-		data.UpdateItems[v[0]] = &bagV1.Item{
-			Count: v[1],
-		}
-	}
-
-	//如果是强制转为负数
-	if len(IsDeduct) > 0 && IsDeduct[0] {
-		for k, v := range data.Items {
-			data.Items[k].Count = -int64(math.Abs(float64(v.Count)))
-		}
-	}
-
 	return
 }
 

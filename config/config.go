@@ -140,7 +140,7 @@ func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) 
 	g.Cfg(name).SetAdapter(adapter)
 
 	//首次运行加入监听器
-	if !gstr.InArray(ApolloListener, name) {
+	if !gstr.InArray(ApolloListener, name+".json") {
 		//放置监听器
 		client, _ := agollo.StartWithConfig(func() (*apolloConfig.AppConfig, error) {
 			return &apolloConfig.AppConfig{
