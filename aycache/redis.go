@@ -11,7 +11,7 @@ var adapterRedisCache = gcache.New()
 func NewAdapterRedis() gcache.Adapter {
 
 	if adapterRedisClient == nil {
-		adapterRedisClient = gcache.NewAdapterRedis(g.Redis("cache"))
+		adapterRedisClient = gcache.NewAdapterRedis(g.Redis("default"))
 		adapterRedisCache.SetAdapter(adapterRedisClient)
 	}
 	return adapterRedisCache
