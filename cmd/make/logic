@@ -1,0 +1,25 @@
+package {package}
+
+import (
+	"game_server/internal/service"
+	"github.com/gogf/gf/v2/os/gctx"
+)
+
+type s{name} struct {
+}
+
+var (
+	ctx    = gctx.New()
+)
+
+func New() *s{name} {
+	return &s{name}{}
+}
+
+func init() {
+	service.Register{name}(New())
+}
+
+func (s *s{name}) Info() {
+
+}

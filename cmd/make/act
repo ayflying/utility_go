@@ -1,0 +1,40 @@
+package act{id}
+
+import (
+	v1 "game_server/api/act/v1"
+	"game_server/internal/service"
+    "github.com/gogf/gf/v2/os/gctx"
+)
+
+type sAct{id} struct {
+}
+
+func New() *sAct{id} {
+	return &sAct{id}{}
+}
+
+var (
+	ActId = {id}
+	ctx   = gctx.New()
+)
+
+type Data struct {
+}
+
+func init() {
+
+}
+
+func (s *sAct{id}) GetData(uid int64) (data *Data) {
+	get, _ := service.GameAct().Info(uid, ActId)
+	get.Scan(&data)
+	if get.IsEmpty() || data == nil {
+		data = &Data{
+		}
+	}
+	return
+}
+
+func (s *sAct{id}) SetData(uid int64, data interface{}) {
+	service.GameAct().Set(uid, ActId, data)
+}
