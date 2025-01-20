@@ -75,13 +75,23 @@ var (
 			url, err := s3Mod.GetFileUrl(getFileName.String(), bucketName)
 			g.Log().Debugf(ctx, "下载地址:%v", url)
 
+			client := g.Client()
+			client.SetTimeout(time.Minute)
+			client.SetDiscovery(nil)
+
 			//循环服务器，推送更新
 			for _, v := range list {
 				address := v.Address
 				g.Log().Debugf(ctx, "准备同步服务器:%v,url=%v", v.Name, address+"/callback/update")
-				get, err := g.Client().Discovery(nil).Timeout(time.Minute*1).Post(ctx, address+"/callback/update", &UpdateReq{
+				get, err := client.Post(ctx, address+"/callback/update", &UpdateReq{
 					FileUrl: url.String(),
 				})
+				if err != nil {
+					get, err = client.Proxy("http://127.0.0.1:10809").
+						Post(ctx, address+"/callback/update", &UpdateReq{
+							FileUrl: url.String(),
+						})
+				}
 				if err != nil {
 					g.Log().Error(ctx, err)
 				}

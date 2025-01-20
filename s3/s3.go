@@ -274,14 +274,14 @@ func (s *Mod) CopyObject(bucketName string, dstStr string, srcStr string) (err e
 
 	// 原始文件
 	var dst = minio.CopyDestOptions{
-		Bucket: dstStr,
-		Object: bucketName,
+		Bucket: bucketName,
+		Object: dstStr,
 	}
 
 	// 新文件
 	var src = minio.CopySrcOptions{
-		Bucket: srcStr,
-		Object: bucketName,
+		Bucket: bucketName,
+		Object: srcStr,
 	}
 
 	_, err = s.client.CopyObject(ctx, dst, src)
