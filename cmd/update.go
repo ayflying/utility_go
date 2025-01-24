@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/gogf/gf/v2/os/gctx"
 	"os"
 	"time"
 )
@@ -15,12 +16,15 @@ type serverCfg struct {
 	Name    string `json:"name" dc:"服务名"`
 	Address string `json:"address" dc:"服务地址"`
 	Prod    bool   `json:"prod" dc:"是否生产环境"`
+	S3      string `json:"s3" dc:"使用哪个对象储存中转"`
 }
 
 type UpdateReq struct {
 	File    *ghttp.UploadFile `json:"file" binding:"required" dc:"文件"`
 	FileUrl string            `json:"file_url" dc:"文件地址"`
 }
+
+var s3Mod *s3.Mod
 
 var (
 	Update = gcmd.Command{
@@ -33,6 +37,7 @@ var (
 			//加载编辑配置文件
 			g.Cfg("hack").GetAdapter().(*gcfg.AdapterFile).SetFileName("hack/config.yaml")
 			getFileName, err := g.Cfg("hack").Get(ctx, "gfcli.build.name")
+			Filename := getFileName.String()
 
 			var list []*serverCfg
 			serverList := g.Cfg().MustGet(ctx, "server_list")
@@ -52,28 +57,9 @@ var (
 			}
 
 			g.Dump("需要更新的服务器", list)
-
-			filename := "linux_amd64/shining_u_server"
-			obj, err := os.Open(filename)
-			ff, err := obj.Stat()
-			var s3Mod *s3.Mod
-			//切换s3目标
-			updateServerS3Name, _ := g.Config().Get(ctx, "update_server_s3_name")
-			if updateServerS3Name != nil {
-				s3Mod = s3.New(updateServerS3Name.String())
-			} else {
-				s3Mod = s3.New("default")
-			}
-			bucketName := s3Mod.GetCfg().BucketName
-
-			_, err = s3Mod.PutObject(obj, getFileName.String(), bucketName, ff.Size())
-			if err != nil {
-				return err
-			}
-
-			//上传当前文件
-			url, err := s3Mod.GetFileUrl(getFileName.String(), bucketName)
-			g.Log().Debugf(ctx, "下载地址:%v", url)
+			//获取上传链接
+			var url = make(map[string]string)
+			filename := "linux_amd64/" + Filename
 
 			client := g.Client()
 			client.SetTimeout(time.Minute)
@@ -82,14 +68,28 @@ var (
 			//循环服务器，推送更新
 			for _, v := range list {
 				address := v.Address
+				if v.S3 == "" {
+					v.S3 = "default"
+				}
+
+				//查询当前上传地址是否存在
+				if _, ok := url[v.S3]; !ok {
+					url[v.S3], err = UploadS3(v.S3, filename)
+					if err != nil {
+						g.Log().Error(ctx, err)
+						return
+					}
+				}
+
 				g.Log().Debugf(ctx, "准备同步服务器:%v,url=%v", v.Name, address+"/callback/update")
 				get, err := client.Post(ctx, address+"/callback/update", &UpdateReq{
-					FileUrl: url.String(),
+					FileUrl: url[v.S3],
 				})
 				if err != nil {
-					get, err = client.Proxy("http://127.0.0.1:10809").
+					g.Log().Debugf(ctx, "切换代理进行上传:err=%v", err)
+					get, err = client.Proxy("http://192.168.50.114:10808").
 						Post(ctx, address+"/callback/update", &UpdateReq{
-							FileUrl: url.String(),
+							FileUrl: url[v.S3],
 						})
 				}
 				if err != nil {
@@ -103,3 +103,22 @@ var (
 		},
 	}
 )
+
+func UploadS3(typ string, filename string) (res string, err error) {
+	//updateServerS3Name, _ := g.Config().Get(ctx, "update_server_s3_name")
+
+	s3Mod = s3.New(typ)
+	bucketName := s3Mod.GetCfg().BucketName
+	obj, err := os.Open(filename)
+	ff, err := obj.Stat()
+	_, err = s3Mod.PutObject(obj, filename, bucketName, ff.Size())
+	if err != nil {
+		return
+	}
+	//上传当前文件
+	get, err := s3Mod.GetFileUrl(filename, bucketName)
+	g.Log().Debugf(gctx.New(), "下载地址:%s", get)
+
+	res = get.String()
+	return
+}
