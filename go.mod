@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/apolloconfig/agollo/v4 v4.4.0
 	github.com/ayflying/excel2json v1.1.2
+	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.8.3
 	github.com/gogf/gf/v2 v2.8.3
 	github.com/minio/minio-go/v7 v7.0.82
@@ -17,7 +18,6 @@ require (
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
-	github.com/elastic/go-elasticsearch/v8 v8.17.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
