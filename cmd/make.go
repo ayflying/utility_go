@@ -2,12 +2,17 @@ package cmd
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"io/fs"
 )
+
+//go:embed make/*
+var ConfigFiles embed.FS
 
 var (
 	Make = gcmd.Command{
@@ -19,8 +24,8 @@ var (
 			{Name: "id", Short: "i", Brief: "活动id"},
 			{Name: "name", Short: "n", Brief: "服务文件名"},
 		},
-		Examples: "make -m=act -id=1:     创建活动1的接口与服务文件 \n" +
-			"make -m=logic -n=test: 创建test的服务文件",
+		Examples: "make -m act -i 1:     创建活动1的接口与服务文件 \n" +
+			"make -m logic -n test: 创建test的服务文件",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 
 			//g.Dump(parser.GetOptAll(), parser.GetArgAll())
@@ -59,7 +64,9 @@ func (c *cMake) Act(id int) (err error) {
 	err = gfile.PutContents(filePath, "package v1\n")
 
 	filePath = fmt.Sprintf("internal/game/act/act%d/act%d.go", id, id)
-	fileStr := gfile.GetContents("internal/cmd/make/act")
+	//fileStr := gfile.GetContents(getFilePath)
+	get, err := fs.ReadFile(ConfigFiles, "make/act")
+	fileStr := string(get)
 	fileStr = gstr.Replace(fileStr, "{id}", gconv.String(id))
 	err = gfile.PutContents(filePath, fileStr)
 
@@ -68,7 +75,9 @@ func (c *cMake) Act(id int) (err error) {
 
 func (c *cMake) Logic(name string) (err error) {
 	var filePath = fmt.Sprintf("internal/logic/%s/%s.go", name, name)
-	fileStr := gfile.GetContents("internal/cmd/make/logic")
+	//fileStr := gfile.GetContents("./make/logic")
+	get, err := fs.ReadFile(ConfigFiles, "make/act")
+	fileStr := string(get)
 	fileStr = gstr.Replace(fileStr, "{package}", name)
 	fileStr = gstr.Replace(fileStr, "{name}", gstr.CaseCamel(name))
 

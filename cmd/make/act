@@ -1,7 +1,6 @@
 package act{id}
 
 import (
-	v1 "game_server/api/act/v1"
 	"game_server/internal/service"
     "github.com/gogf/gf/v2/os/gctx"
 )
@@ -28,7 +27,7 @@ func init() {
 func (s *sAct{id}) GetData(uid int64) (data *Data) {
 	get, _ := service.GameAct().Info(uid, ActId)
 	get.Scan(&data)
-	if get.IsEmpty() || data == nil {
+	if get.IsEmpty() || get.IsNil() || data == nil {
 		data = &Data{
 		}
 	}

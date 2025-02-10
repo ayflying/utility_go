@@ -86,6 +86,15 @@ func (r *F64CountRank) IncrScore(id int64, score int64) (curScore float64, err e
 	return
 }
 
+// todo暂时未使用
+func (r *F64CountRank) GetCount() {
+	count, _ := g.Redis().ZCard(ctx, r.name)
+	if count > 9999 {
+		//删除超过9999的数据
+		g.Redis().ZRemRangeByRank(ctx, r.name, 0, -9999)
+	}
+}
+
 // 删除当前排行榜
 func (r *F64CountRank) Delete() {
 	_, err := g.Redis().Del(ctx, r.name)
