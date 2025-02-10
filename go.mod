@@ -8,7 +8,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.8.3
 	github.com/gogf/gf/v2 v2.8.3
-	github.com/minio/minio-go/v7 v7.0.84
+	github.com/minio/minio-go/v7 v7.0.85
 	github.com/xuri/excelize/v2 v2.9.0
 )
 

@@ -61,8 +61,11 @@ func (c *cMake) Api() {
 
 func (c *cMake) Act(id int) (err error) {
 	filePath := fmt.Sprintf("api/act/v1/act%v.go", id)
+	//生成文件不覆盖
+	if gfile.Exists(filePath) {
+		return
+	}
 	err = gfile.PutContents(filePath, "package v1\n")
-
 	filePath = fmt.Sprintf("internal/game/act/act%d/act%d.go", id, id)
 	//fileStr := gfile.GetContents(getFilePath)
 	get, err := fs.ReadFile(ConfigFiles, "make/act")
@@ -75,6 +78,10 @@ func (c *cMake) Act(id int) (err error) {
 
 func (c *cMake) Logic(name string) (err error) {
 	var filePath = fmt.Sprintf("internal/logic/%s/%s.go", name, name)
+	//生成文件不覆盖
+	if gfile.Exists(filePath) {
+		return
+	}
 	//fileStr := gfile.GetContents("./make/logic")
 	get, err := fs.ReadFile(ConfigFiles, "make/act")
 	fileStr := string(get)
