@@ -93,7 +93,7 @@ func (s *Excel) itemsFormat(list []interface{}, Items []string) []interface{} {
 		for k3, v3 := range v2.(g.Map) {
 			if gstr.InArray(Items, k3) {
 				if _, ok := v3.(string); ok {
-					list[k2].(g.Map)[k3] = s.Spilt2Item(v3.(string))
+					list[k2].(g.Map)[k3] = Spilt2Item(v3.(string))
 				} else {
 					g.Log().Errorf(gctx.New(), "当前类型断言失败:%v,list=%v", v3, v2)
 				}
@@ -108,7 +108,7 @@ func (s *Excel) itemsMapFormat(list []interface{}, Items []string) []interface{}
 		for k3, v3 := range v2.(g.Map) {
 			if gstr.InArray(Items, k3) {
 				if _, ok := v3.(string); ok {
-					get := s.Spilt2Item(v3.(string))
+					get := Spilt2Item(v3.(string))
 					list[k2].(g.Map)[k3] = s.Items2Map(get)
 				} else {
 					g.Log().Errorf(gctx.New(), "当前类型断言失败:%v,list=%v", v3, v2)

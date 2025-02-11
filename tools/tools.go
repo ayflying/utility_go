@@ -55,9 +55,32 @@ func (m *tools) GetDay(t1 *gtime.Time, t2 *gtime.Time) int {
 	return int(t1.Sub(t2).Hours() / 24)
 }
 
+//// 字符串转道具类型
+//func (m *tools) Spilt2Item(str string) (result [][]int64) {
+//	parts := strings.Split(str, "|") // 分割字符串
+//
+//	for i := 0; i < len(parts)-1; i += 2 {
+//		num1, _ := strconv.ParseInt(parts[i], 10, 64)
+//		num2, _ := strconv.ParseInt(parts[i+1], 10, 64)
+//
+//		pair := []int64{num1, num2}
+//		result = append(result, pair)
+//	}
+//	return
+//}
+
 // 字符串转道具类型
 func (m *tools) Spilt2Item(str string) (result [][]int64) {
+	var shadiao = []string{","}
+	for _, v := range shadiao {
+		str = strings.ReplaceAll(str, v, "|")
+	}
+
+	//var parts []string
 	parts := strings.Split(str, "|") // 分割字符串
+	if parts == nil {
+		parts = []string{str}
+	}
 
 	for i := 0; i < len(parts)-1; i += 2 {
 		num1, _ := strconv.ParseInt(parts[i], 10, 64)

@@ -26,7 +26,7 @@ func Excel2Slice(filePath string, _sheet ...string) [][]string {
 }
 
 // 字符串转道具类型
-func (s *Excel) Spilt2Item(str string) (result [][]int64) {
+func Spilt2Item(str string) (result [][]int64) {
 	var shadiao = []string{","}
 	for _, v := range shadiao {
 		str = strings.ReplaceAll(str, v, "|")
@@ -38,20 +38,6 @@ func (s *Excel) Spilt2Item(str string) (result [][]int64) {
 	if parts == nil {
 		parts = []string{str}
 	}
-
-	//var parts []string
-	//for _, v := range parts1 {
-	//	parts = append(parts, strings.Split(v, ",")...) // 分割字符串
-	//}
-
-	//for _, v := range parts1 {
-	//	parts2 := strings.Split(v, ",") // 分割字符串
-	//	if parts2 == nil {
-	//		parts = append(parts, v)
-	//	} else {
-	//		parts = append(parts, parts2...)
-	//	}
-	//}
 
 	for i := 0; i < len(parts)-1; i += 2 {
 		num1, _ := strconv.ParseInt(parts[i], 10, 64)
