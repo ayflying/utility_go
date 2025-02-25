@@ -19,13 +19,13 @@ func (m *timeMod) Load() {
 // 获取本周的开始时间
 func (m *timeMod) StartOfWeek(t time.Time) time.Time {
 	start := gtime.New().AddDate(0, 0, -int(t.Weekday()-1)).Time
-	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
+	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.UTC().Location())
 	return start
 }
 
 func (m *timeMod) StartOfWeekV2(t time.Time) time.Time {
 	start := t.AddDate(0, 0, -int(t.Weekday()-1))
-	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
+	start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.UTC().Location())
 	return start
 }
 
@@ -59,7 +59,7 @@ func (m *timeMod) GetDayPass(startTime time.Time, t ...time.Time) int {
 	month := startTime.Month()
 	day := startTime.Day()
 	// 构建一天的开始时间
-	startTime = time.Date(year, month, day, 0, 0, 0, 0, startTime.Location())
+	startTime = time.Date(year, month, day, 0, 0, 0, 0, startTime.UTC().Location())
 
 	//如果为空，使用当前时间
 	endTime := time.Now()
@@ -89,7 +89,7 @@ func (m *timeMod) GetDayZeroTime(currentTime time.Time, day int) time.Time {
 	// 加上指定天数的时间
 	threeDaysLater := currentTime.AddDate(0, 0, day)
 	// 调整时间为0点
-	zeroTime := time.Date(threeDaysLater.Year(), threeDaysLater.Month(), threeDaysLater.Day(), 0, 0, 0, 0, threeDaysLater.Location())
+	zeroTime := time.Date(threeDaysLater.Year(), threeDaysLater.Month(), threeDaysLater.Day(), 0, 0, 0, 0, threeDaysLater.UTC().Location())
 	return zeroTime
 }
 
@@ -108,7 +108,7 @@ func (m *timeMod) GetEndTime(startTime time.Time, _day ...int) time.Time {
 	// 加上指定天数的时间
 	threeDaysLater := startTime.AddDate(0, 0, day)
 	// 调整时间为0点
-	zeroTime := time.Date(threeDaysLater.Year(), threeDaysLater.Month(), threeDaysLater.Day(), 23, 59, 59, 0, threeDaysLater.Location())
+	zeroTime := time.Date(threeDaysLater.Year(), threeDaysLater.Month(), threeDaysLater.Day(), 23, 59, 59, 0, threeDaysLater.UTC().Location())
 	return zeroTime
 }
 

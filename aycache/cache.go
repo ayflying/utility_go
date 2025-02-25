@@ -1,6 +1,7 @@
 package aycache
 
 import (
+	"github.com/ayflying/utility_go/aycache/drive"
 	"github.com/gogf/gf/v2/os/gcache"
 )
 
@@ -24,6 +25,10 @@ func New(_name ...string) gcache.Adapter {
 		cacheAdapterObj = NewAdapterMemory()
 	case "redis":
 		cacheAdapterObj = NewAdapterRedis()
+	case "file":
+		cacheAdapterObj = NewAdapterFile("runtime/cache")
+	case "es":
+		cacheAdapterObj = drive.NewAdapterElasticsearch([]string{"http://127.0.0.1:9200"})
 	}
 
 	//var client = gcache.New()

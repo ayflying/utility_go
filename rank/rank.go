@@ -36,8 +36,18 @@ func (s *Mod) Load() {
 
 }
 
-// CreateF64CountRank 创建一个排行榜实例 name: [name:赛季]
+// CreateF64CountRank 创建一个排行榜实例
+// 参数:
+//
+//	name: 排行榜的名称，通常代表一个赛季
+//
+// 返回值:
+//
+//	*F64CountRank: 返回一个指向新创建的F64CountRank实例的指针
 func (s *Mod) CreateF64CountRank(name string) *F64CountRank {
+	// 初始化F64CountRank实例的name和updateTs字段
+	// name字段用于标识排行榜的名称，格式为"rank:<name>:score"
+	// updateTs字段用于标识排行榜的更新时间，格式为"rank:<name>:updateTs"
 	return &F64CountRank{
 		name:     fmt.Sprintf("rank:%s:score", name),
 		updateTs: fmt.Sprintf("rank:%s:updateTs", name),
@@ -95,51 +105,71 @@ func (r *F64CountRank) GetCount() {
 	}
 }
 
-// 删除当前排行榜
+// Delete 删除当前排行榜
+// 该方法通过删除Redis中与排行榜相关的键来清除排行榜信息
 func (r *F64CountRank) Delete() {
+	// 删除排行榜数据键
 	_, err := g.Redis().Del(ctx, r.name)
 	if err != nil {
+		// 如果删除失败，记录错误日志
 		g.Log().Error(ctx, "排行榜删除失败:%v", err)
 	}
+	// 删除排行榜更新时间键
 	_, err = g.Redis().Del(ctx, r.updateTs)
 	if err != nil {
+		// 如果删除失败，记录错误日志
 		g.Log().Error(ctx, "排行榜删除失败:%v", err)
 	}
 }
 
 // DelScore 删除当前分数
 //
-//	@Description:
-//	@receiver r
-//	@param id
-//	@return err
+// 该方法从更新时间有序集合和排名有序集合中移除指定的id。
+// 这通常用于从排行榜中删除一个条目，同时确保其在更新时间集合中的对应记录也被清除。
+//
+//	@Description: 从更新时间和排名集合中移除指定id
+//	@receiver r 接收者为F64CountRank类型的实例
+//	@param id 要从集合中移除的条目的ID
+//	@return err 可能发生的错误，如果操作成功，err为nil
 func (r *F64CountRank) DelScore(id int64) (err error) {
+	// 从更新时间集合中移除id
 	_, err = g.Redis().ZRem(ctx, r.updateTs, id)
+	// 从排名集合中移除id
 	_, err = g.Redis().ZRem(ctx, r.name, id)
 	return
 }
 
-// DelScore 删除当前分数
-//
-//	@Description:
-//	@receiver r
-//	@param id
-//	@return err
+// DelByRank 根据排名范围删除元素。
+// 该方法使用了Redis的有序集合数据结构，通过ZRange和ZRemRangeByRank命令来实现。
+// 参数start和stop定义了要删除的排名范围，从start到stop（包括start和stop）。
+// 返回可能的错误。
 func (r *F64CountRank) DelByRank(start int64, stop int64) (err error) {
+	// 初始化一个空的int64切片，用于存储指定排名范围内的元素。
 	var members []int64
+
+	// 使用Redis的ZRange命令获取指定排名范围内的元素。
+	// 选项Rev设置为true，表示按照分数从高到低的顺序返回元素。
 	get, err := g.Redis().ZRange(ctx, r.name, start, stop,
 		gredis.ZRangeOption{
 			Rev: true,
 		})
+
+	// 使用Scan方法将获取到的元素扫描到members切片中。
 	err = get.Scan(&members)
+	// 如果扫描过程中出现错误，直接返回错误。
 	if err != nil {
 		return
 	}
 
+	// 遍历members切片，对于每个元素，使用ZRem命令从更新时间集合中删除对应的成员。
 	for _, member := range members {
 		_, err = g.Redis().ZRem(ctx, r.updateTs, member)
+		// 忽略ZRem操作的错误，因为即使元素不存在，ZRem也不会返回错误。
 	}
+
+	// 使用ZRemRangeByRank命令从有序集合中删除指定排名范围内的元素。
 	_, err = g.Redis().ZRemRangeByRank(ctx, r.name, start, stop)
+	// 返回可能的错误。
 	return
 }
 
@@ -278,44 +308,85 @@ func (r *F64CountRank) UpdateScore(id int64, score int64) (err error) {
 //}
 
 // GetRankInfosNotTs 获取0~count跳记录 不根据更新时间来
+// 该方法使用ZRange命令从Redis中获取指定范围的排名信息，不考虑更新时间
+// 参数:
+//
+//	offset - 获取记录的起始偏移量
+//	count - 获取记录的数量
+//
+// 返回值:
+//
+//	list - 排名信息列表
+//	err - 错误信息，如果执行过程中遇到错误
 func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*Data, err error) {
+	// 初始化存储成员ID的切片
 	var members []int64
+
+	// 使用Redis的ZRange命令获取指定范围的成员ID
+	// 参数Rev设为true以从高分到低分获取成员
 	get, err := g.Redis().ZRange(ctx, r.name, int64(offset), int64(count),
 		gredis.ZRangeOption{
 			Rev: true,
 		}) //.ScanSlice(&members)
+
+	// 将获取的结果扫描到members切片中
 	err = get.Scan(&members)
+	// 如果发生错误，记录日志并返回
 	if err != nil {
 		//logs.Withf("redis err:%v", err)
 		return
 	}
 
+	// 根据获取的成员ID数量初始化排名信息列表
 	list = make([]*Data, len(members))
 	for i := range members {
+		// 获取当前成员ID
 		id := members[i]
-		//id := pgk.InterfaceToNumber[uint64](members[i])
+		// 使用成员ID获取排名信息，不考虑更新时间
 		list[i] = r.GetIdRankNotTs(id)
 	}
+	// 返回排名信息列表和可能的错误
 	return
 }
 
-// 获取指定id的当前排名
+// GetIdRankNotTs 获取指定id的当前排名
+// 该方法从Redis的有序集合中查询指定id的分数和排名信息，不考虑时间戳
+// 参数:
+//
+//	id - 需要查询排名的id
+//
+// 返回值:
+//
+//	rankInfo - 包含id的分数和排名信息的指针，如果没有找到，则返回nil
 func (r *F64CountRank) GetIdRankNotTs(id int64) (rankInfo *Data) {
+	// 初始化rankInfo结构体，设置id，其他字段将通过查询填充
 	rankInfo = &Data{Id: id}
+
+	// 查询有序集合中指定id的分数
 	score, err := g.Redis().ZScore(ctx, r.name, id)
 	if err != nil {
+		// 如果发生错误，直接返回，rankInfo为初始化状态，Id已设置，其他字段为零值
 		return
 	}
+
+	// 将分数转换为int64类型并更新rankInfo
 	rankInfo.Score = int64(score)
+
+	// 如果分数为0，直接返回，表示该id的分数为0，没有进一步查询排名的必要
 	if score == 0 {
 		return
 	}
 
+	// 查询有序集合中指定id的排名
 	rank, err := g.Redis().ZRevRank(ctx, r.name, id)
 	if err != nil {
+		// 如果发生错误，直接返回，rankInfo中仅分数有效，排名信息未更新
 		return
 	}
+
+	// 更新rankInfo中的排名信息，排名从0开始，所以需要加1以符合人类的计数习惯
 	rankInfo.Rank = int32(rank) + 1
 
+	// 返回包含完整排名信息的rankInfo指针
 	return rankInfo
 }

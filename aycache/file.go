@@ -4,6 +4,10 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/gogf/gf/v2/util/gconv"
+	"path"
+	"strings"
 	"time"
 )
 
@@ -12,8 +16,20 @@ type AdapterFile struct {
 }
 
 func (a AdapterFile) Set(ctx context.Context, key interface{}, value interface{}, duration time.Duration) error {
-	//TODO implement me
-	panic("implement me")
+	//defer a.handleLruKey(ctx, key)
+	//expireTime := a.getInternalExpire(duration)
+	//a.data.Set(key, memoryDataItem{
+	//	a: value,
+	//	a: expireTime,
+	//})
+	//c.eventList.PushBack(&adapterMemoryEvent{
+	//	k: key,
+	//	e: expireTime,
+	//})
+
+	arr := strings.Split(":", gconv.String(key))
+	fileName := path.Join(arr...)
+	return gfile.PutBytes(fileName, gconv.Bytes(value))
 }
 
 func (a AdapterFile) SetMap(ctx context.Context, data map[interface{}]interface{}, duration time.Duration) error {
