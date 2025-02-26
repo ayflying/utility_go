@@ -91,7 +91,7 @@ func (c *cMake) Logic(name string) (err error) {
 	//生成文件不覆盖
 	if !gfile.Exists(filePath) {
 		//fileStr := gfile.GetContents("./make/logic")
-		get, _ := fs.ReadFile(ConfigFiles, "make/act")
+		get, _ := fs.ReadFile(ConfigFiles, "make/logic")
 		fileStr := string(get)
 		fileStr = gstr.Replace(fileStr, "{package}", name)
 		fileStr = gstr.Replace(fileStr, "{name}", gstr.CaseCamel(name))
