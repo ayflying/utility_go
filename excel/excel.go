@@ -140,7 +140,7 @@ func (s *Excel) sliceFormat(list []interface{}, Slice map[string]string) []inter
 				if get, ok := v3.(string); !ok {
 					//g.Log().Errorf(gctx.New(), "当前类型断言失败:%v", v3)
 					parts = []string{gconv.String(v3)}
-					continue
+
 				} else {
 					for _, v := range shadiao {
 						get = strings.ReplaceAll(get, v, "|")
