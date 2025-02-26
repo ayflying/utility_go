@@ -16,6 +16,10 @@ import (
 	"time"
 )
 
+var (
+	shadiao = []string{",", ":"}
+)
+
 type FileItem struct {
 	Name     string            `json:"name" dc:"配置文件名"`
 	Filename string            `json:"filename" dc:"文件名"`
@@ -131,7 +135,6 @@ func (s *Excel) sliceFormat(list []interface{}, Slice map[string]string) []inter
 					list[k2].(g.Map)[k3] = []string{}
 					continue
 				}
-
 				var parts []string
 				//断言是否成功
 				if get, ok := v3.(string); !ok {
@@ -139,6 +142,9 @@ func (s *Excel) sliceFormat(list []interface{}, Slice map[string]string) []inter
 					parts = []string{gconv.String(v3)}
 					continue
 				} else {
+					for _, v := range shadiao {
+						get = strings.ReplaceAll(get, v, "|")
+					}
 					parts = strings.Split(get, "|") // 分割字符串
 				}
 

@@ -27,7 +27,6 @@ func Excel2Slice(filePath string, _sheet ...string) [][]string {
 
 // 字符串转道具类型
 func Spilt2Item(str string) (result [][]int64) {
-	var shadiao = []string{","}
 	for _, v := range shadiao {
 		str = strings.ReplaceAll(str, v, "|")
 		//parts = append(parts, strings.Split(str, v)...) // 分割字符串
