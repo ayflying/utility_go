@@ -24,8 +24,9 @@ var (
 			{Name: "id", Short: "i", Brief: "活动id"},
 			{Name: "name", Short: "n", Brief: "服务文件名"},
 		},
-		Examples: "make -m act -i 1:     创建活动1的接口与服务文件 \n" +
-			"make -m logic -n test: 创建test的服务文件",
+		Examples: "make -m act -i 1:    创建活动1的接口与服务文件 \n" +
+			"make -m logic -n test: 	创建test的服务文件 \n" +
+			"make -m config -n test:    创建配置文件",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 
 			//g.Dump(parser.GetOptAll(), parser.GetArgAll())
@@ -46,6 +47,12 @@ var (
 					return
 				}
 				err = this.Logic(name)
+			case "config":
+				var name = parser.GetOpt("name").String()
+				if name == "" {
+					return
+				}
+				err = this.Config(name)
 			}
 
 			return
@@ -88,6 +95,22 @@ func (c *cMake) Logic(name string) (err error) {
 		fileStr := string(get)
 		fileStr = gstr.Replace(fileStr, "{package}", name)
 		fileStr = gstr.Replace(fileStr, "{name}", gstr.CaseCamel(name))
+		err = gfile.PutContents(filePath, fileStr)
+	}
+
+	return
+}
+
+func (c *cMake) Config(name string) (err error) {
+	var filePath = fmt.Sprintf("utility/config/%s.go", name)
+	//生成文件不覆盖
+	if !gfile.Exists(filePath) {
+		get, _ := fs.ReadFile(ConfigFiles, "make/config")
+		fileStr := string(get)
+		fileStr = gstr.Replace(fileStr, "{name}", gstr.CaseCamel(name))
+		fileStr = gstr.Replace(fileStr, "{cfg}", gstr.CaseCamel(name))
+		fileStr = gstr.Replace(fileStr, "{mod}", gstr.CaseCamelLower(name))
+		fileStr = gstr.Replace(fileStr, "{file}", name)
 		err = gfile.PutContents(filePath, fileStr)
 	}
 

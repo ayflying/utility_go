@@ -1,0 +1,51 @@
+package config
+
+import (
+	"github.com/ayflying/utility_go"
+	"github.com/gogf/gf/v2/util/gutil"
+	"sync"
+)
+
+type {cfg}Cfg struct {
+	Id int32 `json:"id" dc:"编号"`
+}
+
+type {mod}Mod struct {
+	once   sync.Once
+	lock   sync.Mutex
+	cfgArr []*{cfg}Cfg
+	cfgMap map[int32]*{cfg}Cfg
+}
+
+var {name} = &{mod}Mod{}
+
+func (c *{mod}Mod) Load(_cfg ...string) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.cfgArr = make([]*{cfg}Cfg, 0)
+	data, err := utility_go.Config.GetFile("{file}")
+	err = data.Scan(&c.cfgArr)
+	if err != nil {
+		panic(err)
+	}
+
+	c.cfgMap = make(map[int32]*{cfg}Cfg)
+	for _, v := range c.cfgArr {
+		c.cfgMap[v.Id] = v
+	}
+}
+
+func (c *{mod}Mod) List() []*{cfg}Cfg {
+	var list = make([]*{cfg}Cfg, len(c.cfgArr))
+	for k, v := range c.cfgArr {
+		list[k] = c.Get(v.Id)
+	}
+	return list
+}
+
+func (c *{mod}Mod) Get(id int32) *{cfg}Cfg {
+	if data, ok := c.cfgMap[id]; ok {
+		return gutil.Copy(data).(*{cfg}Cfg)
+	}
+	return nil
+}
