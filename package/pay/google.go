@@ -2,7 +2,7 @@ package pay
 
 import (
 	"context"
-	playstore2 "github.com/ayflying/utility_go/pay/playstore"
+	"github.com/ayflying/utility_go/package/pay/playstore"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/text/gstr"
@@ -16,14 +16,14 @@ var (
 
 // GooglePay 是一个处理Google支付的结构体。
 type GooglePay struct {
-	c *playstore2.Client
+	c *playstore.Client
 }
 
 // Init 初始化GooglePay客户端。
 // data: 初始化客户端所需的配置数据。
 func (p *GooglePay) Init(data []byte) {
 	var err error
-	p.c, err = playstore2.New(data)
+	p.c, err = playstore.New(data)
 	if err != nil {
 		panic(err) // 如果初始化失败，则panic。
 	}

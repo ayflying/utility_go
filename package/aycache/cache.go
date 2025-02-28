@@ -1,7 +1,7 @@
 package aycache
 
 import (
-	"github.com/ayflying/utility_go/aycache/drive"
+	"github.com/ayflying/utility_go/package/aycache/drive"
 	"github.com/gogf/gf/v2/os/gcache"
 )
 

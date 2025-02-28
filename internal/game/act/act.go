@@ -2,7 +2,7 @@ package act
 
 import (
 	"fmt"
-	"github.com/ayflying/utility_go/aycache"
+	"github.com/ayflying/utility_go/package/aycache"
 	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/os/gctx"

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"github.com/ayflying/utility_go/s3"
+	"github.com/ayflying/utility_go/package/s3"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
