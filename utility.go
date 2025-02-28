@@ -3,7 +3,7 @@ package utility_go
 import (
 	v1 "github.com/ayflying/utility_go/api/system/v1"
 	_ "github.com/ayflying/utility_go/internal/logic"
-	"github.com/ayflying/utility_go/service2"
+	"github.com/ayflying/utility_go/service"
 
 	"github.com/ayflying/utility_go/config"
 )
@@ -13,11 +13,11 @@ var (
 )
 
 func init() {
-	service2.SystemCron().StartCron()
+	service.SystemCron().StartCron()
 
 	//用户活动持久化
-	service2.SystemCron().AddCron(v1.CronType_DAILY, func() error {
-		service2.GameAct().Saves()
+	service.SystemCron().AddCron(v1.CronType_DAILY, func() error {
+		service.GameAct().Saves()
 		return nil
 	})
 }

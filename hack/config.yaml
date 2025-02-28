@@ -3,7 +3,7 @@
 gfcli:
   gen:
     service:
-      dstFolder: "service2"
+      dstFolder: "service"
     pb:
       path: "manifest/protobuf"
       api: "api"

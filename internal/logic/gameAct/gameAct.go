@@ -6,7 +6,7 @@ import (
 	"github.com/ayflying/utility_go/internal/game/act"
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
-	"github.com/ayflying/utility_go/service2"
+	service2 "github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/frame/g"

@@ -3,7 +3,7 @@ package act
 import (
 	"fmt"
 	"github.com/ayflying/utility_go/aycache"
-	"github.com/ayflying/utility_go/service2"
+	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -24,7 +24,7 @@ func GetCacheKey(uid int64, actId int) string {
 func RefreshCache(uid int64, actId int) {
 
 	Cache.Remove(gctx.New(), GetCacheKey(uid, actId))
-	service2.GameAct().RefreshGetRedDotCache(uid)
+	service.GameAct().RefreshGetRedDotCache(uid)
 }
 
 func GetRedDot(uid int64, actId int) *gvar.Var {

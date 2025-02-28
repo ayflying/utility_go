@@ -3,7 +3,7 @@
 // You can delete these comments if you wish manually maintain this interface file.
 // ================================================================================
 
-package service2
+package service
 
 import (
 	"github.com/gogf/gf/v2/frame/g"

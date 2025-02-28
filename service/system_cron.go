@@ -3,7 +3,7 @@
 // You can delete these comments if you wish manually maintain this interface file.
 // ================================================================================
 
-package service2
+package service
 
 import (
 	v1 "github.com/ayflying/utility_go/api/system/v1"

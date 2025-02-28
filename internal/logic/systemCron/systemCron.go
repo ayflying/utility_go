@@ -3,7 +3,7 @@ package systemCron
 import (
 	"context"
 	"github.com/ayflying/utility_go/api/system/v1"
-	"github.com/ayflying/utility_go/service2"
+	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -57,7 +57,7 @@ func New() *sSystemCron {
 }
 
 func init() {
-	service2.RegisterSystemCron(New())
+	service.RegisterSystemCron(New())
 }
 
 // AddCron 添加一个定时任务到相应的调度列表中。
