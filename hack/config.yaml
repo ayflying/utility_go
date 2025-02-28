@@ -1,0 +1,15 @@
+# CLI tool, only in development environment.
+# https://goframe.org/pages/viewpage.action?pageId=3673173
+gfcli:
+  gen:
+    service:
+      dstFolder: "service2"
+    pb:
+      path: "manifest/protobuf"
+      api: "api"
+  docker:
+    build: "-a amd64 -s linux -p temp -ew"
+    tagPrefixes:
+      - "hub.docker.com"
+#      - "git.7cuu.com"
+    tag: "latest"

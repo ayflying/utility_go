@@ -1,6 +1,7 @@
 package utility
 
 import (
+	"github.com/ayflying/utility_go/tools"
 	"math/rand"
 	"time"
 )
@@ -22,7 +23,7 @@ var Rand = rands{
 // 权重是数组中相应元素的值。该函数通过计算累积和来确定选择的索引。
 // 参数 v 是一个泛型参数，限制为实现了 Number 接口的类型。
 // 返回值是一个整数，表示在数组中的索引。
-func RandByArrInt[v Number](s []v) int {
+func RandByArrInt[v tools.Number](s []v) int {
 	sv := 0
 	for i := range s {
 		sv += int(s[i])

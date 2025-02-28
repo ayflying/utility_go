@@ -1,0 +1,25 @@
+
+syntax = "proto3";
+package system;
+
+option go_package = "github.com/ayflying/utility_go/api/system/v1";
+
+// 定义 CronType 计划任务 枚举
+enum CronType {
+  UNKNOWN = 0;  // 未知类型
+  SECOND = 1;   // 每秒触发一次
+  MINUTE = 2;   // 每分钟触发一次
+  HOUR = 3;     // 每小时触发一次
+  DAILY = 4;    // 每天触发一次
+  WEEK = 5;     // 每周触发一次
+  MONTH = 6;    // 每月触发一次
+  YEAR = 7;     // 每年触发一次
+  MONDAY = 8;   // 每周一触发一次
+  TUESDAY = 9;  // 每周二触发一次
+  WEDNESDAY = 10;  // 每周三触发一次
+  THURSDAY = 11;  // 每周四触发一次
+  FRIDAY = 12;  // 每周五触发一次
+  SATURDAY = 13;  // 每周六触发一次
+  SUNDAY = 14;  // 每周日触发一次
+}
+
