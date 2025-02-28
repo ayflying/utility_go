@@ -2,6 +2,8 @@
 # https://goframe.org/pages/viewpage.action?pageId=3673173
 gfcli:
   gen:
+    ctrl:
+      dstFolder: "controller"
     service:
       dstFolder: "service"
     pb:

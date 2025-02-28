@@ -11,10 +11,12 @@ require (
 	github.com/go-pay/util v0.0.4
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.8.3
 	github.com/gogf/gf/v2 v2.8.3
+	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
 	github.com/minio/minio-go/v7 v7.0.85
 	github.com/xuri/excelize/v2 v2.9.0
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	google.golang.org/api v0.44.0
+	google.golang.org/protobuf v1.26.0
 )
 
 require (
@@ -77,7 +79,6 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20210602131652-f16073e35f0c // indirect
 	google.golang.org/grpc v1.38.0 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
