@@ -4,11 +4,12 @@ go 1.23.0
 
 require (
 	github.com/apolloconfig/agollo/v4 v4.4.0
-	github.com/ayflying/excel2json v1.1.2
-	github.com/elastic/go-elasticsearch/v8 v8.17.0
+	github.com/ayflying/excel2json v1.1.3
+	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/go-pay/crypto v0.0.1
 	github.com/go-pay/gopay v1.5.109
 	github.com/go-pay/util v0.0.4
+	github.com/goccy/go-json v0.10.4
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.8.3
 	github.com/gogf/gf/v2 v2.8.3
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
@@ -25,7 +26,7 @@ require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -36,7 +37,6 @@ require (
 	github.com/go-pay/smap v0.0.2 // indirect
 	github.com/go-pay/xlog v0.0.3 // indirect
 	github.com/go-pay/xtime v0.0.2 // indirect
-	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.6.0 // indirect
