@@ -18,6 +18,7 @@ type (
 		// @Description: 向指定的钉钉机器人发送消息。
 		// @receiver s: 系统定时任务结构体指针。
 		// @param value: 要发送的消息内容。
+		// Deprecated: Use message.New(message.DingTalk, DingTalkWebHook).Send(value)
 		DingTalk(DingTalkWebHook string, value string) (res *gclient.Response)
 		ReadLog()
 		// AddCron 添加一个定时任务到相应的调度列表中。

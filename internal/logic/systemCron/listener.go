@@ -3,6 +3,7 @@ package systemCron
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ayflying/utility_go/package/message"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/gclient"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -28,14 +29,14 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 
 		defer get.Close()
 		if err != nil {
-			s.DingTalk(DingTalkWebHook, fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),err=%v", v.Name, err))
+			message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),err=%v", v.Name, err))
 		} else if get.StatusCode != 200 {
-			s.DingTalk(DingTalkWebHook, fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),code=%v,err=%v", v.Name, get.StatusCode, err))
+			message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),code=%v,err=%v", v.Name, get.StatusCode, err))
 		} else {
 			var ststus Status
 			err = json.Unmarshal(get.ReadAll(), &ststus)
 			if ststus.Code != 0 {
-				s.DingTalk(DingTalkWebHook, fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),msg=%v", v.Name, ststus.Message))
+				message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),msg=%v", v.Name, ststus.Message))
 			}
 		}
 	}
@@ -46,7 +47,11 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 // @Description: 向指定的钉钉机器人发送消息。
 // @receiver s: 系统定时任务结构体指针。
 // @param value: 要发送的消息内容。
+// Deprecated: Use message.New(message.DingTalk, DingTalkWebHook).Send(value)
 func (s *sSystemCron) DingTalk(DingTalkWebHook string, value string) (res *gclient.Response) {
+	message.New(message.DingTalk, DingTalkWebHook).Send(value)
+	return
+
 	// 从配置中获取发送者名称
 	name, _ := g.Cfg().Get(ctx, "name")
 
