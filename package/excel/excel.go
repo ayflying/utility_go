@@ -3,6 +3,7 @@ package excel
 import (
 	"context"
 	"github.com/ayflying/excel2json"
+	"github.com/goccy/go-json"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -27,6 +28,7 @@ type FileItem struct {
 	Items    []string          `json:"items" dc:"道具字段"`
 	ItemsMap []string          `json:"items_map" dc:"道具字段map格式"`
 	Slice    map[string]string `json:"slice" dc:"切片"`
+	Json     []string          `json:"json" dc:"json"`
 }
 
 type Excel struct {
@@ -77,6 +79,10 @@ func (s *Excel) ExcelLoad(ctx context.Context, fileItem *FileItem, mainPath stri
 		//格式化切片修改
 		if len(fileItem.Slice) > 0 {
 			list = s.sliceFormat(list, fileItem.Slice)
+		}
+		//json格式转换
+		if len(fileItem.Json) > 0 {
+			list = s.jsonFormat(list, fileItem.Json)
 		}
 
 		//拼接json
@@ -175,5 +181,22 @@ func (s *Excel) sliceFormat(list []interface{}, Slice map[string]string) []inter
 		}
 	}
 
+	return list
+}
+
+func (s *Excel) jsonFormat(list []interface{}, Items []string) []interface{} {
+	for k2, v2 := range list {
+		for k3, v3 := range v2.(g.Map) {
+			if gstr.InArray(Items, k3) {
+				if _, ok := v3.(string); ok {
+					var get interface{}
+					json.Unmarshal([]byte(v3.(string)), &get)
+					list[k2].(g.Map)[k3] = get
+				} else {
+					g.Log().Errorf(gctx.New(), "当前类型断言失败:%v,list=%v", v3, v2)
+				}
+			}
+		}
+	}
 	return list
 }
