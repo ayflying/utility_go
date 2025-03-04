@@ -36,7 +36,6 @@ type Mod struct {
 	cfg    DataType
 }
 
-// Deprecated: Use Pgk.S3()
 func New(_name ...string) *Mod {
 	var name string
 	if len(_name) > 0 {

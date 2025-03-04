@@ -2,6 +2,7 @@ package rank
 
 import (
 	"fmt"
+	v1 "github.com/ayflying/utility_go/api/pgk/v1"
 	"time"
 
 	"github.com/gogf/gf/v2/database/gredis"
@@ -21,14 +22,14 @@ type F64CountRank struct {
 	updateTs string // 更新时间key
 }
 
-type RankData struct {
-	Id       int64
-	Score    int64
-	Rank     int32
-	UpdateTs int64
-}
+//
+//type RankData struct {
+//	Id       int64
+//	Score    int64
+//	Rank     int32
+//	UpdateTs int64
+//}
 
-// Deprecated:Use pgk.Rank()
 func New() *Mod {
 	return &Mod{}
 }
@@ -45,8 +46,6 @@ func (s *Mod) Load() {
 // 返回值:
 //
 //	*F64CountRank: 返回一个指向新创建的F64CountRank实例的指针
-//
-// Deprecated:Use pgk.Rank().CreateF64CountRank(fmt.Sprintf("rank:%v", 1))
 func (s *Mod) CreateF64CountRank(name string) *F64CountRank {
 	// 初始化F64CountRank实例的name和updateTs字段
 	// name字段用于标识排行榜的名称，格式为"rank:<name>:score"
@@ -321,7 +320,7 @@ func (r *F64CountRank) UpdateScore(id int64, score int64) (err error) {
 //
 //	list - 排名信息列表
 //	err - 错误信息，如果执行过程中遇到错误
-func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*RankData, err error) {
+func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*v1.RankData, err error) {
 	// 初始化存储成员ID的切片
 	var members []int64
 
@@ -341,7 +340,7 @@ func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*RankData, e
 	}
 
 	// 根据获取的成员ID数量初始化排名信息列表
-	list = make([]*RankData, len(members))
+	list = make([]*v1.RankData, len(members))
 	for i := range members {
 		// 获取当前成员ID
 		id := members[i]
@@ -361,9 +360,9 @@ func (r *F64CountRank) GetRankInfosNotTs(offset, count int) (list []*RankData, e
 // 返回值:
 //
 //	rankInfo - 包含id的分数和排名信息的指针，如果没有找到，则返回nil
-func (r *F64CountRank) GetIdRankNotTs(id int64) (rankInfo *RankData) {
+func (r *F64CountRank) GetIdRankNotTs(id int64) (rankInfo *v1.RankData) {
 	// 初始化rankInfo结构体，设置id，其他字段将通过查询填充
-	rankInfo = &RankData{Id: id}
+	rankInfo = &v1.RankData{Id: id}
 
 	// 查询有序集合中指定id的分数
 	score, err := g.Redis().ZScore(ctx, r.name, id)

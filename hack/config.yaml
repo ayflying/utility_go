@@ -9,6 +9,7 @@ gfcli:
     pb:
       path: "manifest/protobuf"
       api: "api"
+      ctrl: "controller"
   docker:
     build: "-a amd64 -s linux -p temp -ew"
     tagPrefixes:

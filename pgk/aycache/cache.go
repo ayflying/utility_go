@@ -2,6 +2,7 @@ package aycache
 
 import (
 	"github.com/ayflying/utility_go/package/aycache/drive"
+	drive2 "github.com/ayflying/utility_go/pgk/aycache/drive"
 	"github.com/gogf/gf/v2/os/gcache"
 )
 
@@ -13,7 +14,6 @@ type Mod struct {
 //	return pgk.Cache
 //}
 
-// Deprecated: Use pgk.Cache()
 func New(_name ...string) gcache.Adapter {
 
 	var cacheAdapterObj gcache.Adapter
@@ -23,11 +23,11 @@ func New(_name ...string) gcache.Adapter {
 	}
 	switch name {
 	case "cache":
-		cacheAdapterObj = NewAdapterMemory()
+		cacheAdapterObj = drive2.NewAdapterMemory()
 	case "redis":
-		cacheAdapterObj = NewAdapterRedis()
+		cacheAdapterObj = drive2.NewAdapterRedis()
 	case "file":
-		cacheAdapterObj = NewAdapterFile("runtime/cache")
+		cacheAdapterObj = drive2.NewAdapterFile("runtime/cache")
 	case "es":
 		cacheAdapterObj = drive.NewAdapterElasticsearch([]string{"http://127.0.0.1:9200"})
 	}

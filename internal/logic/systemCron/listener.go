@@ -3,10 +3,10 @@ package systemCron
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ayflying/utility_go/package/message"
+	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	"github.com/ayflying/utility_go/pgk/notice"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/gclient"
-	"github.com/gogf/gf/v2/os/gtime"
 )
 
 type Status struct {
@@ -29,14 +29,14 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 
 		defer get.Close()
 		if err != nil {
-			message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),err=%v", v.Name, err))
+			notice.New(v1.NoticeType_DINGTALK, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),err=%v", v.Name, err))
 		} else if get.StatusCode != 200 {
-			message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),code=%v,err=%v", v.Name, get.StatusCode, err))
+			notice.New(v1.NoticeType_DINGTALK, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),code=%v,err=%v", v.Name, get.StatusCode, err))
 		} else {
 			var ststus Status
 			err = json.Unmarshal(get.ReadAll(), &ststus)
 			if ststus.Code != 0 {
-				message.New(message.DingTalk, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),msg=%v", v.Name, ststus.Message))
+				notice.New(v1.NoticeType_DINGTALK, DingTalkWebHook).Send(fmt.Sprintf("监控报警：服务端访问失败 (%v 服务器),msg=%v", v.Name, ststus.Message))
 			}
 		}
 	}
@@ -49,28 +49,6 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 // @param value: 要发送的消息内容。
 // Deprecated: Use message.New(message.DingTalk, DingTalkWebHook).Send(value)
 func (s *sSystemCron) DingTalk(DingTalkWebHook string, value string) (res *gclient.Response) {
-	message.New(message.DingTalk, DingTalkWebHook).Send(value)
-	return
-
-	// 从配置中获取发送者名称
-	name, _ := g.Cfg().Get(ctx, "name")
-
-	// 定义钉钉机器人发送消息的URL，其中access_token为固定值
-	url := DingTalkWebHook
-	url += "&timestamp=" + gtime.Now().TimestampMilliStr()
-	// 使用goroutine异步发送消息
-
-	var post = g.Map{
-		"msgtype": "text",
-		"text": g.Map{
-			"content": "通知姬 " + name.String() + "：\n" + value + "\n" + gtime.Now().String(),
-		},
-	}
-
-	// 构建发送的消息体，包含消息类型和内容
-	res, err := g.Client().Discovery(nil).ContentJson().Post(ctx, url, post)
-	if err != nil {
-		g.Log().Info(ctx, err)
-	}
+	notice.New(v1.NoticeType_DINGTALK, DingTalkWebHook).Send(value)
 	return
 }
