@@ -2,9 +2,9 @@ package callback
 
 import (
 	"context"
-	"new-gitlab.adesk.com/public_project/utility_go/service"
+	"github.com/ayflying/utility_go/service"
 
-	"new-gitlab.adesk.com/public_project/utility_go/api/callback/v1"
+	"github.com/ayflying/utility_go/api/callback/v1"
 )
 
 func (c *ControllerV1) Ip(ctx context.Context, req *v1.IpReq) (res *v1.IpRes, err error) {

@@ -1,12 +1,12 @@
 package pgk
 
 import (
+	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	"github.com/ayflying/utility_go/pgk/aycache"
+	"github.com/ayflying/utility_go/pgk/notice"
+	"github.com/ayflying/utility_go/pgk/rank"
+	"github.com/ayflying/utility_go/pgk/s3"
 	"github.com/gogf/gf/v2/os/gcache"
-	v1 "new-gitlab.adesk.com/public_project/utility_go/api/pgk/v1"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/aycache"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/notice"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/rank"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/s3"
 )
 
 var ()

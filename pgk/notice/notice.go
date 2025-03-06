@@ -1,8 +1,8 @@
 package notice
 
 import (
-	v1 "new-gitlab.adesk.com/public_project/utility_go/api/pgk/v1"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/notice/drive"
+	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	"github.com/ayflying/utility_go/pgk/notice/drive"
 )
 
 type MessageV1 interface {

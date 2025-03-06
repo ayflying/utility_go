@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"context"
+	"github.com/ayflying/utility_go/package/s3"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gctx"
-	"new-gitlab.adesk.com/public_project/utility_go/package/s3"
 	"os"
 	"time"
 )

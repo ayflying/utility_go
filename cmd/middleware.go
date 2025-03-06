@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/errors/gcode"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/text/gstr"
-	"new-gitlab.adesk.com/public_project/utility_go/service"
 )
 
 //func MiddlewareAnonymous(r *ghttp.Request) {

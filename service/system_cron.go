@@ -6,8 +6,8 @@
 package service
 
 import (
+	v1 "github.com/ayflying/utility_go/api/system/v1"
 	"github.com/gogf/gf/v2/net/gclient"
-	v1 "new-gitlab.adesk.com/public_project/utility_go/api/system/v1"
 )
 
 type (

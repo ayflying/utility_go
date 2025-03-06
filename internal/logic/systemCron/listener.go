@@ -3,10 +3,10 @@ package systemCron
 import (
 	"encoding/json"
 	"fmt"
+	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	"github.com/ayflying/utility_go/pgk/notice"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/gclient"
-	v1 "new-gitlab.adesk.com/public_project/utility_go/api/pgk/v1"
-	"new-gitlab.adesk.com/public_project/utility_go/pgk/notice"
 )
 
 type Status struct {

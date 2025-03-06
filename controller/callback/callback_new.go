@@ -5,7 +5,7 @@
 package callback
 
 import (
-	"new-gitlab.adesk.com/public_project/utility_go/api/callback"
+	"github.com/ayflying/utility_go/api/callback"
 )
 
 type ControllerV1 struct{}

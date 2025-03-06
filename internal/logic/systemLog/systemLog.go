@@ -2,10 +2,10 @@ package systemLog
 
 import (
 	"context"
+	v1 "github.com/ayflying/utility_go/api/admin/v1"
+	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
-	v1 "new-gitlab.adesk.com/public_project/utility_go/api/admin/v1"
-	"new-gitlab.adesk.com/public_project/utility_go/service"
 )
 
 type sSystemLog struct {
