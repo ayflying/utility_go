@@ -7,7 +7,7 @@ package callback
 import (
 	"context"
 
-	"github.com/ayflying/utility_go/api/callback/v1"
+	"new-gitlab.adesk.com/public_project/utility_go/api/callback/v1"
 )
 
 type ICallbackV1 interface {

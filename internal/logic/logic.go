@@ -5,9 +5,9 @@
 package logic
 
 import (
-	_ "github.com/ayflying/utility_go/internal/logic/gameAct"
-	_ "github.com/ayflying/utility_go/internal/logic/ip2region"
-	_ "github.com/ayflying/utility_go/internal/logic/logData"
-	_ "github.com/ayflying/utility_go/internal/logic/systemCron"
-	_ "github.com/ayflying/utility_go/internal/logic/systemLog"
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic/gameAct"
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic/ip2region"
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic/logData"
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic/systemCron"
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic/systemLog"
 )
