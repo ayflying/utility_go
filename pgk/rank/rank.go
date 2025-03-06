@@ -2,7 +2,7 @@ package rank
 
 import (
 	"fmt"
-	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	v1 "new-gitlab.adesk.com/public_project/utility_go/api/pgk/v1"
 	"time"
 
 	"github.com/gogf/gf/v2/database/gredis"

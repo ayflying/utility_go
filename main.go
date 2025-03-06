@@ -1,15 +1,17 @@
 package utility_go
 
 import (
+	_ "new-gitlab.adesk.com/public_project/utility_go/internal/logic"
+
 	"context"
-	v1 "github.com/ayflying/utility_go/api/system/v1"
-	_ "github.com/ayflying/utility_go/internal/logic"
-	"github.com/ayflying/utility_go/service"
-	"github.com/gogf/gf/v2/os/gctx"
-	"github.com/gogf/gf/v2/os/gtimer"
 	"time"
 
-	"github.com/ayflying/utility_go/config"
+	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gtimer"
+	v1 "new-gitlab.adesk.com/public_project/utility_go/api/system/v1"
+	"new-gitlab.adesk.com/public_project/utility_go/service"
+
+	"new-gitlab.adesk.com/public_project/utility_go/config"
 )
 
 var (

@@ -1,8 +1,8 @@
 package aycache
 
 import (
-	"github.com/ayflying/utility_go/package/aycache/drive"
 	"github.com/gogf/gf/v2/os/gcache"
+	"new-gitlab.adesk.com/public_project/utility_go/package/aycache/drive"
 )
 
 type Mod struct {

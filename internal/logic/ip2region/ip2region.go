@@ -1,12 +1,12 @@
 package ip2region
 
 import (
-	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
 	"net"
+	"new-gitlab.adesk.com/public_project/utility_go/service"
 	"strings"
 )
 

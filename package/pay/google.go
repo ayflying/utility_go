@@ -2,12 +2,12 @@ package pay
 
 import (
 	"context"
-	"github.com/ayflying/utility_go/package/pay/playstore"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"google.golang.org/api/androidpublisher/v3"
+	"new-gitlab.adesk.com/public_project/utility_go/package/pay/playstore"
 )
 
 var (

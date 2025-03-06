@@ -2,10 +2,10 @@ package logData
 
 import (
 	"context"
-	"github.com/ayflying/utility_go/service"
-	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"new-gitlab.adesk.com/public_project/utility_go/service"
+	"new-gitlab.adesk.com/public_project/utility_go/tools"
 	"time"
 )
 

@@ -2,12 +2,12 @@ package systemCron
 
 import (
 	"context"
-	"github.com/ayflying/utility_go/api/system/v1"
-	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtimer"
+	"new-gitlab.adesk.com/public_project/utility_go/api/system/v1"
+	"new-gitlab.adesk.com/public_project/utility_go/service"
 	"sync"
 	"time"
 )

@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/ayflying/utility_go/internal/model/entity"
 	"github.com/gogf/gf/v2/frame/g"
+	"new-gitlab.adesk.com/public_project/utility_go/internal/model/entity"
 )
 
 type SystemLog struct {

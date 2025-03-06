@@ -1,4 +1,4 @@
-module github.com/ayflying/utility_go
+module new-gitlab.adesk.com/public_project/utility_go
 
 go 1.23.0
 
