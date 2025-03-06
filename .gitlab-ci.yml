@@ -21,16 +21,16 @@ format:
     - go vet $(go list ./... | grep -v /vendor/)
     - go test -race $(go list ./... | grep -v /vendor/)
 
-compile:
-  stage: build
-  script:
-    - mkdir -p mybinaries
-    - go build -o mybinaries main.go
-  artifacts:
-    paths:
-      - build
-
-deploy:
-  stage: deploy
-  script: echo "Define your deployment script!"
-  environment: production
+#compile:
+#  stage: build
+#  script:
+#    - mkdir -p mybinaries
+#    - go build -o mybinaries main.go
+#  artifacts:
+#    paths:
+#      - build
+#
+#deploy:
+#  stage: deploy
+#  script: echo "Define your deployment script!"
+#  environment: production
