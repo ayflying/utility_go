@@ -2,10 +2,10 @@ package gameAct
 
 import (
 	"fmt"
-	"github.com/ayflying/utility_go/internal/game/act"
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
 	"github.com/ayflying/utility_go/package/aycache"
+	"github.com/ayflying/utility_go/pgk"
 	service2 "github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/container/gset"
@@ -221,46 +221,10 @@ func (s *sGameAct) Save(actId int) (err error) {
 
 // 清空GetRedDot缓存
 func (s *sGameAct) RefreshGetRedDotCache(uid int64) {
-	//cacheKey2 := fmt.Sprintf("gameAct:GetRedDot:%d", uid)
-	cacheKey := fmt.Sprintf("gameAct:GetRedDot:%s:%d", gtime.Now().Format("Ymd"), uid)
-	act.Cache.Remove(gctx.New(), cacheKey)
+	cacheKey := fmt.Sprintf("gameAct:GetRedDot:%s:%d", gtime.Now().Format("d"), uid)
+	_, err := pgk.Cache("redis").Remove(gctx.New(), cacheKey)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		g.Dump(err)
+	}
 }
-
-//
-//func (s *sGameAct) GetRedDot(uid int64) (res map[string]int32, err error) {
-//	cacheKey := fmt.Sprintf("gameAct:GetRedDot:%s:%d", gtime.Now().Format("Ymd"), uid)
-//	if get, _ := act.Cache.Get(ctx, cacheKey); !get.IsEmpty() {
-//		err = get.Scan(&res)
-//		return
-//	}
-//
-//	res = make(map[string]int32)
-//
-//	//res["notice_count"] = 0
-//	//获取所有帖子红点
-//	for _, v := range communityNotice.Types {
-//		res[fmt.Sprintf("notice_%d", v)], err = service.CommunityNotice().Ping(uid, noticeV1.NoticeType(v))
-//	}
-//
-//	//邮件红点
-//	res["mail_count"], err = service.GameMail().RedDot(uid)
-//
-//	//act1可领取数量
-//	res["act1_count"], err = act1.New().RedDot(uid)
-//
-//	//act2可领取数量
-//	res["act2_count"], err = act2.New().RedDot(uid)
-//
-//	//成就红点
-//	res["act4_count"], err = act4.New().RedDot(uid)
-//
-//	//广告点击
-//	res["act6_count"], err = act6.New().RedDot(uid)
-//
-//	for k, v := range act.RedDotList {
-//		res[k] = v(uid)
-//	}
-//
-//	aycache.New().Set(ctx, cacheKey, res, time.Hour)
-//	return
-//}

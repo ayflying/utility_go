@@ -6,17 +6,17 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 )
 
-type Mod struct {
+type DingTalkMod struct {
 	DingTalkWebHook string
 }
 
-func Load(webHook string) *Mod {
-	return &Mod{
+func DingTalkLoad(webHook string) *DingTalkMod {
+	return &DingTalkMod{
 		DingTalkWebHook: webHook,
 	}
 }
 
-func (m Mod) Send(value string) {
+func (m DingTalkMod) Send(value string) {
 	ctx := gctx.New()
 	// 从配置中获取发送者名称
 	name, _ := g.Cfg().Get(ctx, "name")
