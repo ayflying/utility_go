@@ -5,8 +5,15 @@ import (
 	"time"
 )
 
+var (
+	Rand *randMod
+)
+
+type randMod struct {
+}
+
 // RandomAll 按权重随机选取 N 个不重复的元素
-func (m *tools) RandomAll(data map[int]int, n int) []int {
+func (m *randMod) RandomAll(data map[int]int, n int) []int {
 	if n > len(data) {
 		return nil
 	}
