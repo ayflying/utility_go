@@ -6,6 +6,7 @@ import (
 	"github.com/ayflying/utility_go/internal/model/entity"
 	"github.com/ayflying/utility_go/package/aycache"
 	"github.com/ayflying/utility_go/pgk"
+	"github.com/ayflying/utility_go/pkg"
 	service2 "github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/container/gset"
@@ -70,8 +71,8 @@ func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
 	// 将查询到的活动信息保存到Redis缓存中
 	_, err = g.Redis().Set(ctx, keyCache, data)
 
-	var ActUidUpdateTimeCacheKey = fmt.Sprintf("act:update:%d", uid)
-	aycache.New("redis").Set(ctx, ActUidUpdateTimeCacheKey, uid, time.Hour*24*3)
+	var CacheKey = fmt.Sprintf("act:update:%d", uid)
+	pkg.Cache("redis").Set(ctx, CacheKey, uid, time.Hour*24*3)
 
 	return
 }
@@ -148,9 +149,9 @@ func (s *sGameAct) Save(actId int) (err error) {
 				continue
 			}
 
-			var ActUidUpdateTimeCacheKey = fmt.Sprintf("act:update:%d", uid)
+			var CacheKey = fmt.Sprintf("act:update:%d", uid)
 			//如果有活跃，跳过持久化
-			if getBool, _ := aycache.New("redis").Contains(ctx, ActUidUpdateTimeCacheKey); getBool {
+			if getBool, _ := aycache.New("redis").Contains(ctx, CacheKey); getBool {
 				continue
 			}
 

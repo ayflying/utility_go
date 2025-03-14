@@ -46,8 +46,6 @@ func (s *Mod) Load() {
 // 返回值:
 //
 //	*F64CountRank: 返回一个指向新创建的F64CountRank实例的指针
-
-// Deprecated: pgk.Rnak().CreateF64CountRank("赛季")
 func (s *Mod) CreateF64CountRank(name string) *F64CountRank {
 	// 初始化F64CountRank实例的name和updateTs字段
 	// name字段用于标识排行榜的名称，格式为"rank:<name>:score"

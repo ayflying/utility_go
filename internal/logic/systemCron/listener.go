@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	v1 "github.com/ayflying/utility_go/api/pgk/v1"
-	"github.com/ayflying/utility_go/pgk/notice"
+	"github.com/ayflying/utility_go/pkg/notice"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/gclient"
 )

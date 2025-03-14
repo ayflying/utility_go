@@ -2,7 +2,7 @@ package notice
 
 import (
 	v1 "github.com/ayflying/utility_go/api/pgk/v1"
-	"github.com/ayflying/utility_go/pgk/notice/drive"
+	"github.com/ayflying/utility_go/pkg/notice/drive"
 )
 
 type MessageV1 interface {
