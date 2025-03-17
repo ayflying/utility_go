@@ -138,14 +138,13 @@ func (s *sGameAct) Save(actId int) (err error) {
 			}
 
 			cacheGet, _ := g.Redis().Get(ctx, cacheKey)
-			//最后删除key
-			delKey = append(delKey, cacheKey)
+
 			if uid == 0 {
 				//跳过为空的用户缓存
 				continue
 			}
 			if cacheGet.IsEmpty() {
-				//空数据也不巴保存
+				//空数据也不保存
 				continue
 			}
 
@@ -154,12 +153,6 @@ func (s *sGameAct) Save(actId int) (err error) {
 			if getBool, _ := aycache.New("redis").Contains(ctx, CacheKey); getBool {
 				continue
 			}
-
-			////如果1天没有活跃，跳过
-			//user, _ := service.MemberUser().Info(uid)
-			//if user.UpdatedAt.Seconds < gtime.Now().Add(consts.ActSaveTime).Unix() {
-			//	continue
-			//}
 
 			//获取数据库数据
 			var data *entity.GameAct
@@ -185,7 +178,8 @@ func (s *sGameAct) Save(actId int) (err error) {
 				data.Action = actionData
 				add = append(add, data)
 			}
-
+			//最后删除key
+			delKey = append(delKey, cacheKey)
 		}
 
 		//批量写入数据库

@@ -15,7 +15,7 @@ type randMod struct {
 // RandomAll 按权重随机选取 N 个不重复的元素
 func (m *randMod) RandomAll(data map[int]int, n int) []int {
 	if n > len(data) {
-		return nil
+		n = len(data)
 	}
 	rand.Seed(time.Now().UnixNano())
 	// 复制权重映射，避免修改原始数据
