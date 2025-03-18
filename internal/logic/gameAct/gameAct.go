@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
-	"github.com/ayflying/utility_go/package/aycache"
 	"github.com/ayflying/utility_go/pgk"
 	"github.com/ayflying/utility_go/pkg"
 	service2 "github.com/ayflying/utility_go/service"
@@ -72,7 +71,7 @@ func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
 	_, err = g.Redis().Set(ctx, keyCache, data)
 
 	var CacheKey = fmt.Sprintf("act:update:%d", uid)
-	pkg.Cache("redis").Set(ctx, CacheKey, uid, time.Hour*24*3)
+	pkg.Cache("redis").Set(ctx, CacheKey, uid, time.Hour*24*1)
 
 	return
 }
@@ -148,9 +147,9 @@ func (s *sGameAct) Save(actId int) (err error) {
 				continue
 			}
 
-			var CacheKey = fmt.Sprintf("act:update:%d", uid)
 			//如果有活跃，跳过持久化
-			if getBool, _ := aycache.New("redis").Contains(ctx, CacheKey); getBool {
+			if getBool, _ := pkg.Cache("redis").Contains(ctx,
+				fmt.Sprintf("act:update:%d", uid)); getBool {
 				continue
 			}
 
