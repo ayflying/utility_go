@@ -2,7 +2,6 @@ package act{id}
 
 import (
 	service2 "github.com/ayflying/utility_go/service"
-    "github.com/gogf/gf/v2/os/gctx"
 )
 
 type sAct{id} struct {
@@ -14,7 +13,7 @@ func New() *sAct{id} {
 
 var (
 	ActId = {id}
-	ctx   = gctx.New()
+	Name = ""
 )
 
 type Data struct {

@@ -223,3 +223,33 @@ func ReverseSlice[T comparable](s []T) []T {
 	}
 	return s
 }
+
+// 道具数量合并
+func (m *tools) ItemsMerge(_items ...[][]int64) [][]int64 {
+	var items [][]int64
+	for _, v := range _items {
+		items = append(items, v...)
+	}
+	if len(items) == 0 {
+		return [][]int64{}
+	}
+	var temp = make(map[int64]int64)
+	for _, v := range items {
+		if len(v) < 2 {
+			g.Log().Errorf(ctx, "分解的物品格式不对:%v", v)
+			continue
+		}
+		if _, ok := temp[v[0]]; !ok {
+			temp[v[0]] = 0
+		}
+		temp[v[0]] += v[1]
+	}
+
+	items = make([][]int64, len(temp))
+	i := 0
+	for k, v := range temp {
+		items[i] = []int64{k, v}
+		i++
+	}
+	return items
+}

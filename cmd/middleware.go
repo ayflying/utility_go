@@ -62,9 +62,9 @@ func MiddlewareAdmin(r *ghttp.Request) {
 	ip := r.GetClientIp()
 	r.SetCtxVar("ip", ip)
 
-	get := r.Cookie.Get("uid")
+	getUid := r.Cookie.Get("uid")
 
-	if get == nil {
+	if getUid == nil {
 		//调试模式允许不验证用户名
 		debug, _ := g.Cfg().GetWithEnv(nil, "debug")
 		if !debug.Bool() {
@@ -82,7 +82,13 @@ func MiddlewareAdmin(r *ghttp.Request) {
 
 	}
 
-	uid := get.Int()
+	uid := getUid.Int()
+
+	//获取所有请求的信息
+	get := r.GetRequestMapStrStr()
+	if _, ok := get["uid"]; ok {
+		r.SetCtxVar("uid", get["uid"])
+	}
 
 	r.Middleware.Next()
 

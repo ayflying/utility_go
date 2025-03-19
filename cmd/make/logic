@@ -9,7 +9,7 @@ type s{name} struct {
 }
 
 var (
-	ctx    = gctx.New()
+
 )
 
 func New() *s{name} {
