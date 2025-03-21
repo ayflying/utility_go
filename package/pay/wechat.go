@@ -1,3 +1,4 @@
+//Deprecated: 使用新的 pkg.Pay()
 package pay
 
 import (
@@ -27,6 +28,7 @@ type WechatPay struct {
 	PrivateKey string
 }
 
+// Deprecated: pkg.Pay().Wechat()
 func Wechat() *WechatPay {
 	var pay = &WechatPay{}
 	var err error
