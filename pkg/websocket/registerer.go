@@ -1,7 +1,9 @@
 package websocket
 
+import "context"
+
 // 定义一个处理方法的类型
-type Handler func(uid int64, data []byte)
+type Handler func(ctx context.Context, req any) (err error)
 
 // 路由器的处理映射
 var (

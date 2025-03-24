@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"context"
 	"github.com/gogf/gf/v2/container/gmap"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -15,7 +16,7 @@ import (
 type SocketV1 struct{}
 
 var (
-	ctx = gctx.New()
+	//ctx = gctx.New()
 	//Conn map[uuid.UUID]*WebsocketData
 	lock sync.Mutex
 
@@ -26,7 +27,7 @@ type WebsocketData struct {
 	Ws   *websocket.Conn
 	Uuid uuid.UUID
 	Uid  int64
-	Data g.Var
+	Ctx  context.Context
 }
 
 func NewV1() *SocketV1 {
@@ -51,6 +52,7 @@ func (s *SocketV1) Load(serv *ghttp.Server, prefix string) {
 		}
 		group.Bind(
 			func(r *ghttp.Request) {
+				ctx := r.Context()
 				ws, err := websocketCfg.Upgrade(r.Response.Writer, r.Request, nil)
 				if err != nil {
 					glog.Error(ctx, err)
@@ -58,7 +60,7 @@ func (s *SocketV1) Load(serv *ghttp.Server, prefix string) {
 				}
 
 				//ws联机触发器
-				NewV1().OnConnect(ws)
+				NewV1().OnConnect(ctx, ws)
 			},
 		)
 
@@ -70,7 +72,7 @@ func (s *SocketV1) Load(serv *ghttp.Server, prefix string) {
 //	@Description:
 //	@receiver s
 //	@param conn
-func (s *SocketV1) OnConnect(conn *websocket.Conn) {
+func (s *SocketV1) OnConnect(ctx context.Context, conn *websocket.Conn) {
 	//lock.Lock()
 	//defer lock.Unlock()
 
@@ -81,7 +83,7 @@ func (s *SocketV1) OnConnect(conn *websocket.Conn) {
 	data := &WebsocketData{
 		Uuid: id,
 		Ws:   conn,
-		Data: g.Var{},
+		Ctx:  ctx,
 	}
 	m.Set(id, data)
 
@@ -121,7 +123,7 @@ func (s *SocketV1) OnMessage(conn *WebsocketData, req []byte, msgType int) {
 	handler, exist := handlers[cmd]
 	if exist {
 		//匹配上路由器
-		handler(conn.Uid, []byte(msg))
+		handler(conn.Ctx, msg)
 	} else {
 		//fmt.Println("未注册的路由器ID:", cmd)
 		s.Send(conn.Uuid, []byte("未注册的协议号:"+msgStr[:8]))
@@ -166,7 +168,7 @@ func (s *SocketV1) SendAll(data []byte) {
 //	@param conn
 func (s *SocketV1) OnClose(id uuid.UUID, conn *websocket.Conn) {
 	// 在此处编写断开连接后的处理逻辑
-	g.Log().Debugf(ctx, "WebSocket connection from %s has been closed.", conn.RemoteAddr())
+	g.Log().Debugf(gctx.New(), "WebSocket connection from %s has been closed.", conn.RemoteAddr())
 
 	// 可能的后续操作：
 	// 1. 更新连接状态或从连接池移除
