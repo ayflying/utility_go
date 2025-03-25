@@ -12,6 +12,8 @@ require (
 	github.com/goccy/go-json v0.10.4
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.9.0
 	github.com/gogf/gf/v2 v2.9.0
+	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
 	github.com/minio/minio-go/v7 v7.0.85
 	github.com/xuri/excelize/v2 v2.9.0
@@ -40,9 +42,7 @@ require (
 	github.com/go-pay/xtime v0.0.2 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
-	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
