@@ -1,7 +1,7 @@
 syntax = "proto3";
 package package;
 
-option go_package = "github.com/ayflying/utility_go/api/pgk/v1";
+option go_package = "github.com/ayflying/utility_go/api/pkg/v1";
 
 
 // 定义 NoticeType 枚举
