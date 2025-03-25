@@ -3,6 +3,7 @@ package pkg
 import (
 	v1 "github.com/ayflying/utility_go/api/pgk/v1"
 	"github.com/ayflying/utility_go/pkg/aycache"
+	"github.com/ayflying/utility_go/pkg/config"
 	"github.com/ayflying/utility_go/pkg/notice"
 	"github.com/ayflying/utility_go/pkg/rank"
 	"github.com/ayflying/utility_go/pkg/s3"
@@ -32,4 +33,8 @@ func Rank() *rank.Mod {
 
 func Websocket() *websocket.SocketV1 {
 	return websocket.NewV1()
+}
+
+func Config() *config.Cfg {
+	return config.NewV1()
 }

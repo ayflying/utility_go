@@ -33,7 +33,6 @@ func New(name ...string) *elastic {
 	return &elastic{
 		client: es,
 	}
-
 }
 
 // createIndex 创建索引
