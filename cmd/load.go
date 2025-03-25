@@ -16,8 +16,6 @@ func RegistrationAnonymous(group *ghttp.RouterGroup) (res []interface{}) {
 
 // 注册用户方法
 func RegistrationUser(group *ghttp.RouterGroup) (res []interface{}) {
-	group.Bind(
-		callback.NewV1(),
-	)
+	group.Bind()
 	return
 }
