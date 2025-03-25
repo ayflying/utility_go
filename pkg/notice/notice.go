@@ -1,7 +1,7 @@
 package notice
 
 import (
-	v1 "github.com/ayflying/utility_go/api/pgk/v1"
+	v1 "github.com/ayflying/utility_go/api/pkg/v1"
 	"github.com/ayflying/utility_go/pkg/notice/drive"
 )
 
