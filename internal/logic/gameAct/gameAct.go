@@ -231,7 +231,7 @@ func (s *sGameAct) Del(uid int64, actId int) {
 	keyCache := fmt.Sprintf("act:%v:%v", actId, uid)
 
 	//删除活动缓存
-	g.Redis("redis").Del(ctx, keyCache)
+	g.Redis().Del(ctx, keyCache)
 
 	//删除当前活动储存
 	g.Model(Name).Where(do.GameAct{
