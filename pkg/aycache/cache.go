@@ -29,7 +29,7 @@ func New(_name ...string) gcache.Adapter {
 	case "file":
 		cacheAdapterObj = drive2.NewAdapterFile("runtime/cache")
 	case "es":
-		cacheAdapterObj = drive.NewAdapterElasticsearch([]string{"http://127.0.0.1:9200"})
+		cacheAdapterObj = drive.NewAdapterElasticsearch(_name[1])
 	}
 
 	//var client = gcache.New()

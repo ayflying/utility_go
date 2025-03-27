@@ -46,7 +46,7 @@ type elastic struct {
 //}
 //
 //// getDocument 获取文档
-//func (d *Driver) GetDocument(name string, id string) (res json.RawMessage) {
+//func (d *Driver) Get(name string, id string) (res json.RawMessage) {
 //	resp, err := d.client.Get(name, id).
 //		Do(context.Background())
 //	if err != nil {

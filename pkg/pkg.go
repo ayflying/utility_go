@@ -4,6 +4,7 @@ import (
 	v1 "github.com/ayflying/utility_go/api/pkg/v1"
 	"github.com/ayflying/utility_go/pkg/aycache"
 	"github.com/ayflying/utility_go/pkg/config"
+	"github.com/ayflying/utility_go/pkg/elasticsearch"
 	"github.com/ayflying/utility_go/pkg/notice"
 	"github.com/ayflying/utility_go/pkg/rank"
 	"github.com/ayflying/utility_go/pkg/s3"
@@ -37,4 +38,8 @@ func Websocket() *websocket.SocketV1 {
 
 func Config() *config.Cfg {
 	return config.NewV1()
+}
+
+func Elastic(name string) *elasticsearch.Elastic {
+	return elasticsearch.NewV1(name)
 }

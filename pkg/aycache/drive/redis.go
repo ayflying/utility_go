@@ -19,7 +19,6 @@ func NewAdapterRedis() gcache.Adapter {
 		redisObj, _ := gredis.New(cfg)
 		//adapterRedisClient = gcache.NewAdapterRedis(g.Redis("default"))
 		adapterRedisClient = gcache.NewAdapterRedis(redisObj)
-
 		adapterRedisCache.SetAdapter(adapterRedisClient)
 	}
 	return adapterRedisCache

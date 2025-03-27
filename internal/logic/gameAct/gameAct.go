@@ -222,3 +222,22 @@ func (s *sGameAct) RefreshGetRedDotCache(uid int64) {
 		g.Dump(err)
 	}
 }
+
+func (s *sGameAct) Del(uid int64, actId int) {
+	if uid == 0 || actId == 0 {
+		g.Log().Error(ctx, "当前参数为空")
+		return
+	}
+	// 构造缓存键名
+	keyCache := fmt.Sprintf("act:%v:%v", actId, uid)
+
+	//删除活动缓存
+	g.Redis().Del(ctx, keyCache)
+
+	//删除当前活动储存
+	g.Model(Name).Where(do.GameAct{
+		Uid:   uid,
+		ActId: actId,
+	}).Delete()
+
+}

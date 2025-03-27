@@ -33,6 +33,7 @@ type (
 		Save(actId int) (err error)
 		// 清空GetRedDot缓存
 		RefreshGetRedDotCache(uid int64)
+		Del(uid int64, actId int)
 	}
 )
 
