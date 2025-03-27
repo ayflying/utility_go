@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
-	"github.com/ayflying/utility_go/pgk"
 	"github.com/ayflying/utility_go/pkg"
 	service2 "github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
@@ -216,7 +215,7 @@ func (s *sGameAct) Save(actId int) (err error) {
 // 清空GetRedDot缓存
 func (s *sGameAct) RefreshGetRedDotCache(uid int64) {
 	cacheKey := fmt.Sprintf("gameAct:GetRedDot:%s:%d", gtime.Now().Format("d"), uid)
-	_, err := pgk.Cache("redis").Remove(gctx.New(), cacheKey)
+	_, err := pkg.Cache("redis").Remove(gctx.New(), cacheKey)
 	if err != nil {
 		g.Log().Error(ctx, err)
 		g.Dump(err)
@@ -232,7 +231,7 @@ func (s *sGameAct) Del(uid int64, actId int) {
 	keyCache := fmt.Sprintf("act:%v:%v", actId, uid)
 
 	//删除活动缓存
-	g.Redis().Del(ctx, keyCache)
+	g.Redis("redis").Del(ctx, keyCache)
 
 	//删除当前活动储存
 	g.Model(Name).Where(do.GameAct{
