@@ -7,13 +7,15 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcron"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/os/gtimer"
 	"sync"
 	"time"
 )
 
 var (
-	ctx = gctx.New()
+	ctx       = gctx.New()
+	startTime *gtime.Time
 )
 
 // sSystemCron 结构体定义了系统定时任务的秒计时器。
@@ -110,6 +112,12 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 //	@receiver s
 //	@return err
 func (s *sSystemCron) StartCron() (err error) {
+	//预防重复启动
+	if startTime != nil {
+		return
+	}
+	startTime = gtime.Now()
+
 	g.Log().Debug(ctx, "启动计划任务定时器详情")
 	//每秒任务
 	gtimer.SetInterval(ctx, time.Second, func(ctx context.Context) {
