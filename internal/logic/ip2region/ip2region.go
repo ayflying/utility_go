@@ -34,13 +34,12 @@ func init() {
 //	@receiver s *sIp2region: sIp2region的实例。
 func (s *sIp2region) Load() {
 	var err error
-	//var dbPath = "/mnt/s3/ip2region.xdb"
-	var dbPath = "lib/ip2region.xdb"
+	var dbPath = "/runtime/library/ip2region.xdb"
 
 	if gfile.IsEmpty(dbPath) {
 		//下载文件
 		putData, err2 := g.Client().Discovery(nil).
-			Get(ctx, "https://resource.luoe.cn/pgk/ip2region.xdb")
+			Get(ctx, "https://resource.luoe.cn/attachment/ip2region.xdb")
 		if err2 != nil {
 			return
 		}

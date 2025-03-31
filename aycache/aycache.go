@@ -9,10 +9,6 @@ type Mod struct {
 	client *gcache.Cache
 }
 
-//func NewV1(_name ...string) *cache.Mod {
-//	return pgk.Cache
-//}
-
 // Deprecated:弃用，改用 pkg.Cache()
 func New(_name ...string) gcache.Adapter {
 

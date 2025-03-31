@@ -10,10 +10,6 @@ type Mod struct {
 	client *gcache.Cache
 }
 
-//func NewV1(_name ...string) *cache.Mod {
-//	return pgk.Cache
-//}
-
 func New(_name ...string) gcache.Adapter {
 
 	var cacheAdapterObj gcache.Adapter
