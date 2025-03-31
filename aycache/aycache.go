@@ -13,7 +13,7 @@ type Mod struct {
 //	return pgk.Cache
 //}
 
-// Deprecated:弃用，改用 pgk.Cache()
+// Deprecated:弃用，改用 pkg.Cache()
 func New(_name ...string) gcache.Adapter {
 
 	var cacheAdapterObj gcache.Adapter
