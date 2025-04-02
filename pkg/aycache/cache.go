@@ -1,9 +1,15 @@
 package aycache
 
 import (
+	v1 "github.com/ayflying/utility_go/api/system/v1"
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/ayflying/utility_go/pkg/aycache/drive"
 	drive2 "github.com/ayflying/utility_go/pkg/aycache/drive"
+	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"math"
 )
 
 type Mod struct {
@@ -12,23 +18,23 @@ type Mod struct {
 
 var (
 	QPSCount int
-	//QPS      = promauto.NewGauge(
-	//	prometheus.GaugeOpts{
-	//		Name: "Cache_QPS",
-	//		Help: "当前缓存QPS数量",
-	//	},
-	//)
+	QPS      = promauto.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "Cache_QPS",
+			Help: "当前缓存QPS数量",
+		},
+	)
 )
 
 func init() {
-	//boot.AddFunc(func() {
-	//	//初始化指标
-	//	service.SystemCron().AddCron(v1.CronType_MINUTE, func() error {
-	//		QPS.Set(math.Round(float64(QPSCount) / 60))
-	//		QPSCount = 0
-	//		return nil
-	//	})
-	//})
+	boot.AddFunc(func() {
+		//初始化指标
+		service.SystemCron().AddCron(v1.CronType_MINUTE, func() error {
+			QPS.Set(math.Round(float64(QPSCount) / 60))
+			QPSCount = 0
+			return nil
+		})
+	})
 
 }
 
