@@ -38,13 +38,14 @@ func init() {
 //	@receiver s *sIp2region: sIp2region的实例。
 func (s *sIp2region) Load() {
 	var err error
+
+	var url = "https://github.com/ayflying/resource/raw/refs/heads/main/attachment/ip2region.xdb"
 	var dbPath = "runtime/library/ip2region.xdb"
 
 	if gfile.IsEmpty(dbPath) {
 		g.Log().Debug(ctx, "等待下载ip库文件")
 		//下载文件
-		putData, err2 := g.Client().Discovery(nil).
-			Get(ctx, "https://resource.luoe.cn/attachment/ip2region.xdb")
+		putData, err2 := g.Client().Discovery(nil).Get(ctx, url)
 		if err2 != nil {
 			return
 		}

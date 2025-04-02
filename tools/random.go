@@ -56,9 +56,11 @@ func (m *randMod) RandomAll(data map[int]int, n int) []int {
 // RandByArrInt 根据传入的 interface 切片中的整数值按权重随机返回一个索引
 // 参数 s: 一个包含整数的 interface 切片，切片中的每个元素代表一个权重
 // 返回值: 随机选中的元素的索引
-func RandByArrInt(s []interface{}) int {
+func (m *randMod) RandByArrInt(_s interface{}) int {
 	// 初始化总权重为 0
 	sv := 0
+	s := gconv.Ints(_s)
+
 	// 遍历切片，累加每个元素的权重
 	for i := range s {
 		sv += gconv.Int(s[i])
@@ -73,7 +75,7 @@ func RandByArrInt(s []interface{}) int {
 	var all int
 	// 再次遍历切片，累加权重
 	for i := range s {
-		all += gconv.Int(s[i])
+		all += s[i]
 		// 如果当前累加的权重大于随机数，则返回当前索引
 		if all > r {
 			return i

@@ -132,7 +132,7 @@ func RemoveSlice[t Number](slice []t, value ...t) []t {
 	// 从后向前遍历切片
 	for i := len(slice) - 1; i >= 0; i-- {
 		// 检查当前元素是否等于需要移除的值
-		if InArray(slice[i], value) {
+		if InArray[t](value, slice[i]) {
 			// 如果相等，移除该元素
 			// 使用append和切片操作符来实现移除操作，将i之前和i之后的元素合并到一起
 			slice = append(slice[:i], slice[i+1:]...)
@@ -149,7 +149,7 @@ func RemoveSlice[t Number](slice []t, value ...t) []t {
 //	@param value 需要查找的值
 //	@param array 进行查找的切片
 //	@return bool 返回是否存在
-func InArray[t Number](value t, array []t) bool {
+func InArray[t Number](array []t, value t) bool {
 	for _, v := range array {
 		if v == value {
 			return true
