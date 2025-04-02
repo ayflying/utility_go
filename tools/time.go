@@ -121,3 +121,10 @@ func (m *timeMod) GetDailyTimeList(time1 time.Time, time2 time.Time) (timeList [
 	}
 	return
 }
+
+// ExcelTime2Time excel时间转时间 (12/10/24 02:03转为时间)
+func (m *timeMod) ExcelTime2Time(excelTime string) time.Time {
+	layout := "01/02/06 15:04" // 月/日/年(最后两位) 小时:分钟 (24小时制)
+	timeNew, _ := time.ParseInLocation(layout, excelTime, time.Local)
+	return timeNew
+}

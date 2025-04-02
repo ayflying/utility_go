@@ -1,6 +1,8 @@
 package tools
 
 import (
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/gogf/gf/v2/util/grand"
 	"math/rand"
 	"time"
 )
@@ -49,4 +51,34 @@ func (m *randMod) RandomAll(data map[int]int, n int) []int {
 		}
 	}
 	return result
+}
+
+// RandByArrInt 根据传入的 interface 切片中的整数值按权重随机返回一个索引
+// 参数 s: 一个包含整数的 interface 切片，切片中的每个元素代表一个权重
+// 返回值: 随机选中的元素的索引
+func RandByArrInt(s []interface{}) int {
+	// 初始化总权重为 0
+	sv := 0
+	// 遍历切片，累加每个元素的权重
+	for i := range s {
+		sv += gconv.Int(s[i])
+	}
+	if sv < 1 {
+		return 0
+	}
+
+	// 使用 grand.Intn 生成一个 0 到总权重之间的随机数
+	r := grand.Intn(sv)
+	// 初始化当前累加的权重为 0
+	var all int
+	// 再次遍历切片，累加权重
+	for i := range s {
+		all += gconv.Int(s[i])
+		// 如果当前累加的权重大于随机数，则返回当前索引
+		if all > r {
+			return i
+		}
+	}
+	// 如果没有找到符合条件的索引，返回 0
+	return 0
 }

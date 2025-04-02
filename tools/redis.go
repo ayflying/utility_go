@@ -14,7 +14,7 @@ type redis struct {
 }
 
 func (r *redis) Load() {
-	g.Log().Debugf(gctx.New(), "初始化工具类")
+	g.Log().Debugf(gctx.New(), "初始化redis工具类")
 	if Redis == nil {
 		Redis = &redis{}
 	}

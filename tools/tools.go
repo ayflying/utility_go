@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/json"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -30,7 +31,7 @@ type tools struct {
 }
 
 func init() {
-	g.Log().Debugf(gctx.New(), "初始化工具类")
+	g.Log().Debugf(gctx.New(), "初始化tools工具类")
 
 	names := []toolsInterface{
 		Tools,
@@ -252,4 +253,34 @@ func (m *tools) ItemsMerge(_items ...[][]int64) [][]int64 {
 		i++
 	}
 	return items
+}
+
+// ProcessingMap 处理map
+// 该函数用于递归处理一个键为字符串、值为int64的map。
+// 如果键是一个JSON字符串，会尝试将其解析为一个新的map，并递归处理这个新的map。
+// 最终返回一个处理后的map，其中所有键都是非JSON字符串。
+func (m *tools) ProcessingMap(data map[string]int64) map[string]int64 {
+	// 创建一个临时map，用于存储处理后的键值对
+	var temp = make(map[string]int64)
+	// 遍历输入的map
+	for k, v := range data {
+		// 创建一个新的map，用于存储解析后的JSON数据
+		data_k := make(map[string]int64)
+		// 尝试将键解析为JSON数据
+		err := json.Unmarshal([]byte(k), &data_k)
+		// 如果解析成功
+		if err == nil {
+			// 递归处理解析后的map
+			data_kmap := m.ProcessingMap(data_k)
+			// 返回处理后的map
+			// 如果解析失败，直接将原键值对添加到临时map中
+			// 将递归处理后的结果合并到临时map中
+			for k_k, k_v := range data_kmap {
+				temp[k_k] = k_v
+			}
+		} else {
+			temp[k] = v
+		}
+	}
+	return temp
 }
