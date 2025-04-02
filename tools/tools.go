@@ -2,6 +2,7 @@ package tools
 
 import (
 	"encoding/json"
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -31,15 +32,17 @@ type tools struct {
 }
 
 func init() {
-	g.Log().Debugf(gctx.New(), "初始化tools工具类")
+	boot.AddFunc(func() {
+		g.Log().Debugf(gctx.New(), "初始化tools工具类")
 
-	names := []toolsInterface{
-		Tools,
-	}
-	for _, v := range names {
-		v.Load()
-	}
+		names := []toolsInterface{
+			Tools,
+		}
+		for _, v := range names {
+			v.Load()
+		}
 
+	})
 }
 
 func (m *tools) Load() {

@@ -11,6 +11,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/util/gconv"
 	"strconv"
 	"strings"
 	"time"
@@ -130,7 +131,8 @@ func (s *sGameAct) Save(actId int) (err error) {
 			result := strings.Split(cacheKey, ":")
 			actId, err = strconv.Atoi(result[1])
 			var uid int64
-			uid, err = strconv.ParseInt(result[2], 10, 64)
+			uid = gconv.Int64(result[2])
+			//uid, err = strconv.ParseInt(result[2], 10, 64)
 			if err != nil {
 				continue
 			}

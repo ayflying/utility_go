@@ -2,6 +2,7 @@ package found
 
 import (
 	"database/sql"
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -21,16 +22,18 @@ const (
 )
 
 func init() {
-	var (
-		err         error
-		driverObj   = New()
-		driverNames = g.SliceStr{"es", "found"}
-	)
-	for _, driverName := range driverNames {
-		if err = gdb.Register(driverName, driverObj); err != nil {
-			panic(err)
+	boot.AddFunc(func() {
+		var (
+			err         error
+			driverObj   = New()
+			driverNames = g.SliceStr{"es", "found"}
+		)
+		for _, driverName := range driverNames {
+			if err = gdb.Register(driverName, driverObj); err != nil {
+				panic(err)
+			}
 		}
-	}
+	})
 }
 
 // New create and returns a driver that implements gdb.Driver, which supports operations for MySQL.

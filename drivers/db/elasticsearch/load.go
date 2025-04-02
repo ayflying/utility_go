@@ -14,7 +14,7 @@ const (
 	quoteChar = "`"
 )
 
-func init() {
+func Init() {
 	var (
 		err         error
 		driverObj   = New()

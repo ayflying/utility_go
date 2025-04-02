@@ -1,14 +1,11 @@
 package aycache
 
 import (
-	v1 "github.com/ayflying/utility_go/api/system/v1"
 	"github.com/ayflying/utility_go/pkg/aycache/drive"
 	drive2 "github.com/ayflying/utility_go/pkg/aycache/drive"
-	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"math"
 )
 
 type Mod struct {
@@ -24,16 +21,6 @@ var (
 		},
 	)
 )
-
-func init() {
-
-	service.SystemCron().AddCron(v1.CronType_MINUTE, func() error {
-		QPS.Set(math.Round(float64(QPSCount) / 60))
-		QPSCount = 0
-		return nil
-	})
-
-}
 
 func New(_name ...string) gcache.Adapter {
 
