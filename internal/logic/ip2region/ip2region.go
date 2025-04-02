@@ -38,7 +38,7 @@ func init() {
 //	@receiver s *sIp2region: sIp2region的实例。
 func (s *sIp2region) Load() {
 	var err error
-	var dbPath = "/runtime/library/ip2region.xdb"
+	var dbPath = "runtime/library/ip2region.xdb"
 
 	if gfile.IsEmpty(dbPath) {
 		g.Log().Debug(ctx, "等待下载ip库文件")
