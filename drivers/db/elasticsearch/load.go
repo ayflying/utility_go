@@ -1,6 +1,7 @@
 package elasticsearch
 
 import (
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -14,17 +15,20 @@ const (
 	quoteChar = "`"
 )
 
-func Init() {
-	var (
-		err         error
-		driverObj   = New()
-		driverNames = g.SliceStr{"es", "elasticsearch"}
-	)
-	for _, driverName := range driverNames {
-		if err = gdb.Register(driverName, driverObj); err != nil {
-			panic(err)
+func init() {
+	boot.AddFunc(func() {
+		var (
+			err         error
+			driverObj   = New()
+			driverNames = g.SliceStr{"es", "elasticsearch"}
+		)
+		for _, driverName := range driverNames {
+			if err = gdb.Register(driverName, driverObj); err != nil {
+				panic(err)
+			}
 		}
-	}
+	})
+
 }
 
 // New create and returns a driver that implements gdb.Driver, which supports operations for MySQL.

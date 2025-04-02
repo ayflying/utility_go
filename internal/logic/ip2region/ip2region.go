@@ -1,6 +1,7 @@
 package ip2region
 
 import (
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -19,13 +20,16 @@ type sIp2region struct {
 }
 
 func New() *sIp2region {
-	s := &sIp2region{}
-	s.Load()
-	return s
+
+	return &sIp2region{}
 }
 
 func init() {
 	service.RegisterIp2Region(New())
+
+	boot.AddFunc(func() {
+		service.Ip2Region().Load()
+	})
 }
 
 // Load 加载到内存中
@@ -37,6 +41,7 @@ func (s *sIp2region) Load() {
 	var dbPath = "/runtime/library/ip2region.xdb"
 
 	if gfile.IsEmpty(dbPath) {
+		g.Log().Debug(ctx, "等待下载ip库文件")
 		//下载文件
 		putData, err2 := g.Client().Discovery(nil).
 			Get(ctx, "https://resource.luoe.cn/attachment/ip2region.xdb")

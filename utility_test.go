@@ -1,9 +1,9 @@
 package utility_go_test
 
 import (
-	"github.com/ayflying/utility_go/internal/boot"
-	_ "github.com/ayflying/utility_go/internal/logic"
+	//_ "github.com/ayflying/utility_go/internal/logic"
 
+	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"testing"

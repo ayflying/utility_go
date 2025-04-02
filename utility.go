@@ -4,6 +4,7 @@ import (
 	"github.com/ayflying/utility_go/config"
 	"github.com/ayflying/utility_go/internal/boot"
 	_ "github.com/ayflying/utility_go/internal/logic"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 )
 
@@ -13,12 +14,11 @@ var (
 )
 
 func init() {
-	go func() {
-		// 初始化配置
-		var err = boot.Boot()
-		if err != nil {
-			panic(err)
-		}
-	}()
+	g.Log().Debug(ctx, "utility_go init启动完成")
+	// 初始化配置
+	var err = boot.Boot()
+	if err != nil {
+		panic(err)
+	}
 
 }
