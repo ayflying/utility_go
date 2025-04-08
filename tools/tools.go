@@ -20,9 +20,9 @@ type Number interface {
 	int | int64 | int32 | int16 | uint64 | uint32 | uint16 | float32 | float64
 }
 
-//type Any interface {
-//	interface{} | string | int | int64 | int32 | int16 | uint64 | uint32 | uint16 | float32 | float64
-//}
+type Any interface {
+	string | int | int64 | int32 | int16 | uint64 | uint32 | uint16 | float32 | float64
+}
 
 type toolsInterface interface {
 	Load()

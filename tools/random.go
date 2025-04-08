@@ -53,6 +53,44 @@ func (m *randMod) RandomAll(data map[int]int, n int) []int {
 	return result
 }
 
+func RandomAll[t Any](data map[t]int, n int) []t {
+	if n > len(data) {
+		n = len(data)
+	}
+	rand.Seed(time.Now().UnixNano())
+	// 复制权重映射，避免修改原始数据
+	remainingWeights := make(map[t]int)
+	for k, v := range data {
+		remainingWeights[k] = v
+	}
+	result := make([]t, 0, n)
+
+	for i := 0; i < n; i++ {
+		totalWeight := 0
+		// 计算剩余元素的总权重
+		for _, weight := range remainingWeights {
+			totalWeight += weight
+		}
+		if totalWeight == 0 {
+			break
+		}
+		// 生成一个 0 到总权重之间的随机数
+		randomNum := rand.Intn(totalWeight)
+		currentWeight := 0
+		for key, weight := range remainingWeights {
+			currentWeight += weight
+			if randomNum < currentWeight {
+				// 将选中的元素添加到结果切片中
+				result = append(result, key)
+				// 从剩余权重映射中移除选中的元素
+				delete(remainingWeights, key)
+				break
+			}
+		}
+	}
+	return result
+}
+
 // RandByArrInt 根据传入的 interface 切片中的整数值按权重随机返回一个索引
 // 参数 s: 一个包含整数的 interface 切片，切片中的每个元素代表一个权重
 // 返回值: 随机选中的元素的索引
