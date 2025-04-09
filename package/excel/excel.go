@@ -111,8 +111,12 @@ func (s *Excel) RemoveComments(list []interface{}, json []string) []interface{} 
 		// 遍历当前元素的每个键值对
 		for _, v3 := range v2.(g.Map) {
 			// 如果字符串中存在//则跳过不写入temp
-			if gstr.Contains(gconv.String(v3), "//") {
-				//delKey = append(delKey, k2)
+			//if gstr.Contains(gconv.String(v3), "//") {
+			//	//delKey = append(delKey, k2)
+			//	add = false
+			//	break
+			//}
+			if strings.HasPrefix(gconv.String(v3), "//") {
 				add = false
 				break
 			}
