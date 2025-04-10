@@ -1,0 +1,10 @@
+package {name}
+
+type {name} struct {
+}
+
+func New() *{name} {
+	return &{name}{}
+}
+
+func init() {}

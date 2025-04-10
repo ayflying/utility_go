@@ -1,0 +1,19 @@
+package {name}
+
+import (
+	"github.com/ayflying/utility_go/pkg"
+	"github.com/ayflying/utility_go/pkg/websocket"
+	"google.golang.org/protobuf/proto"
+)
+
+func (s *{name}) {func}Handler(conn *websocket.WebsocketData, req any) (err error) {
+	var data = &v1.{func}2S{}
+	err = proto.Unmarshal(req.([]byte), data)
+
+	var res = &v1.{func}2C{}
+
+	resp, err := proto.Marshal(res)
+	pkg.Websocket().Send(000000, conn.Uid, resp)
+
+	return
+}

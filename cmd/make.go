@@ -26,7 +26,8 @@ var (
 		},
 		Examples: "make -m act -i 1:    创建活动1的接口与服务文件 \n" +
 			"make -m logic -n test: 	创建test的服务文件 \n" +
-			"make -m config -n test:    创建配置文件",
+			"make -m config -n test:    创建配置文件 \n" +
+			"make -m socket -n test:    创建socket文件 \n",
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 
 			//g.Dump(parser.GetOptAll(), parser.GetArgAll())
@@ -53,6 +54,12 @@ var (
 					return
 				}
 				err = this.Config(name)
+			case "socket":
+				var name = parser.GetOpt("name").String()
+				if name == "" {
+					return
+				}
+				err = this.Socket(name)
 			}
 
 			return
@@ -112,6 +119,28 @@ func (c *cMake) Config(name string) (err error) {
 		fileStr = gstr.Replace(fileStr, "{mod}", gstr.CaseCamelLower(name))
 		fileStr = gstr.Replace(fileStr, "{file}", name)
 		err = gfile.PutContents(filePath, fileStr)
+	}
+
+	return
+}
+
+func (c *cMake) Socket(name string) (err error) {
+	var filePath = fmt.Sprintf("internal/socket/%s/%s_new.go", name, gstr.CaseSnake(name))
+	//生成文件不覆盖
+	if !gfile.Exists(filePath) {
+		// 生成目录文件
+		get, _ := fs.ReadFile(ConfigFiles, "make/socket")
+		fileStr := string(get)
+		fileStr = gstr.Replace(fileStr, "{name}", name)
+		err = gfile.PutContents(filePath, fileStr)
+
+		//生成方法文件
+		var filePath2 = fmt.Sprintf("internal/socket/%s/%s.go", name, gstr.CaseSnake(name))
+		get, _ = fs.ReadFile(ConfigFiles, "make/socket2")
+		fileStr = string(get)
+		fileStr = gstr.Replace(fileStr, "{name}", name)
+		fileStr = gstr.Replace(fileStr, "{func}", gstr.CaseCamel(name))
+		err = gfile.PutContents(filePath2, fileStr)
 	}
 
 	return
