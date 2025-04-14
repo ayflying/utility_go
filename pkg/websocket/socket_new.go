@@ -3,6 +3,8 @@ package websocket
 import (
 	"context"
 	"fmt"
+	"github.com/ayflying/utility_go/pkg/aycache"
+	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/container/gmap"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
@@ -10,10 +12,10 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/glog"
 	"github.com/gogf/gf/v2/util/guid"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
 	"sync"
+	"time"
 )
 
 type SocketV1 struct {
@@ -23,17 +25,18 @@ type SocketV1 struct {
 var (
 	//ctx = gctx.New()
 	//Conn map[uuid.UUID]*WebsocketData
-	lock sync.Mutex
-
-	m = gmap.NewHashMap(true)
+	lock  sync.Mutex
+	cache = aycache.New("redis")
+	m     = gmap.NewHashMap(true)
 )
 
 type WebsocketData struct {
-	Ws     *websocket.Conn
-	Uuid   string
-	Uid    int64
-	Ctx    context.Context
-	RoomId int
+	Ws     *websocket.Conn `json:"ws" dc:"websocket连接池"`
+	Uuid   string          `json:"uuid" dc:"用户唯一标识"`
+	Uid    int64           `json:"uid" dc:"用户编号"`
+	Groups []string        `json:"groups" dc:"群组"`
+	Ctx    context.Context `json:"ctx" dc:""`
+	RoomId int             `json:"roomId" dc:"房间编号"`
 }
 
 func NewV1() *SocketV1 {
@@ -87,9 +90,11 @@ func (s *SocketV1) OnConnect(ctx context.Context, conn *websocket.Conn) {
 	id := guid.S()
 	ip := conn.RemoteAddr().String()
 	data := &WebsocketData{
-		Uuid: id,
-		Ws:   conn,
-		Ctx:  ctx,
+		Uuid:   id,
+		Ws:     conn,
+		Ctx:    ctx,
+		Groups: make([]string, 0),
+		RoomId: -1,
 	}
 	m.Set(id, data)
 
@@ -205,17 +210,18 @@ func (s *SocketV1) Uid2Uuid(uid int64) (uuid string) {
 //	@receiver s
 //	@param uid
 //	@param data
-func (s *SocketV1) SendUuid(cmd int32, id uuid.UUID, req proto.Message) {
-	if !m.Contains(id) {
+func (s *SocketV1) SendUuid(cmd int32, uuidStr string, req proto.Message) {
+	if !m.Contains(uuidStr) {
 		return
 	}
+	//格式化数据
 	var data, err = proto.Marshal(req)
 	if err != nil {
 		g.Log().Error(gctx.New(), err)
 		return
 	}
 
-	conn := m.Get(id).(*WebsocketData)
+	conn := m.Get(uuidStr).(*WebsocketData)
 
 	//前置方法
 
@@ -223,9 +229,7 @@ func (s *SocketV1) SendUuid(cmd int32, id uuid.UUID, req proto.Message) {
 		temp := v(cmd, data, 0, "")
 		data, _ = proto.Marshal(temp)
 	}
-
 	conn.Ws.WriteMessage(s.Type, data)
-
 	return
 }
 
@@ -242,26 +246,7 @@ func (s *SocketV1) Send(cmd int32, uid int64, req proto.Message) {
 	if uuid == "" {
 		return
 	}
-	if !m.Contains(uuid) {
-		return
-	}
-
-	//格式化数据
-	var data, err = proto.Marshal(req)
-	if err != nil {
-		g.Log().Error(gctx.New(), err)
-		return
-	}
-
-	conn := m.Get(uuid).(*WebsocketData)
-
-	//前置方法
-
-	for _, v := range Byte2Pb {
-		temp := v(cmd, data, 0, "")
-		data, _ = proto.Marshal(temp)
-	}
-	conn.Ws.WriteMessage(s.Type, data)
+	s.SendUuid(cmd, uuid, req)
 	return
 }
 
@@ -287,6 +272,47 @@ func (s *SocketV1) SendAll(cmd int32, req proto.Message) {
 	})
 }
 
+//加入群组
+func (s *SocketV1) JoinGroup(conn *WebsocketData, group string) {
+	conn.Groups = append(conn.Groups, group)
+	cacheKey := "websocket:group:" + group
+	get, _ := aycache.New("redis").Get(conn.Ctx, cacheKey)
+	var list = make(map[int64]string)
+	if !get.IsNil() {
+		get.Scan(&list)
+	}
+	list[conn.Uid] = conn.Uuid
+	cache.Set(conn.Ctx, cacheKey, list, time.Hour*24*7)
+}
+
+// 退出群组
+func (s *SocketV1) LeaveGroup(conn *WebsocketData, group string) {
+	conn.Groups = tools.RemoveSlice[string](conn.Groups, group)
+	cacheKey := "websocket:group:" + group
+	get, _ := cache.Get(conn.Ctx, cacheKey)
+	var list = make(map[int64]string)
+	if !get.IsNil() {
+		get.Scan(&list)
+	}
+	delete(list, conn.Uid)
+	cache.Set(conn.Ctx, cacheKey, list, time.Hour*24*7)
+}
+
+//群组广播
+func (s *SocketV1) SendGroup(cmd int32, group string, req proto.Message) {
+	cacheKey := "websocket:group:" + group
+	get, _ := cache.Get(gctx.New(), cacheKey)
+	var list = make(map[int64]string)
+	if !get.IsNil() {
+		get.Scan(&list)
+	}
+	for uid, v := range list {
+		if m.Contains(v) {
+			s.Send(cmd, uid, req)
+		}
+	}
+}
+
 // OnClose
 //
 //	@Description:
@@ -303,6 +329,9 @@ func (s *SocketV1) OnClose(conn *WebsocketData) {
 	uid := conn.Uid
 	if uid > 0 {
 		s.UnBindUid(uid)
+		for _, v := range conn.Groups {
+			s.LeaveGroup(conn, v)
+		}
 	}
 
 	// 可能的后续操作：

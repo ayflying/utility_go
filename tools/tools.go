@@ -128,7 +128,7 @@ func (m *tools) Items2Map(items [][]int64) (list map[int64]int64) {
 // 该函数通过遍历切片，从后向前检查每个元素，如果找到与指定值相等的元素，则将其从切片中移除。
 // 这种从后向前的遍历方法可以避免因移除元素而导致的数组重新排列带来的额外计算。
 // RemoveSlice 删除切片中的某个值
-func RemoveSlice[t Number](slice []t, value ...t) []t {
+func RemoveSlice[t Any](slice []t, value ...t) []t {
 	// 从后向前遍历切片
 	for i := len(slice) - 1; i >= 0; i-- {
 		// 检查当前元素是否等于需要移除的值
@@ -149,7 +149,7 @@ func RemoveSlice[t Number](slice []t, value ...t) []t {
 //	@param value 需要查找的值
 //	@param array 进行查找的切片
 //	@return bool 返回是否存在
-func InArray[t Number](array []t, value t) bool {
+func InArray[t Any](array []t, value t) bool {
 	for _, v := range array {
 		if v == value {
 			return true
