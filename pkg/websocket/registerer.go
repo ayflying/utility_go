@@ -8,7 +8,7 @@ type Handler2 func(conn *WebsocketData)
 
 type HandlerMessage func(conn *WebsocketData, req any)
 
-type PbType func(code int32, data []byte) proto.Message
+type PbType func(cmd int32, data []byte, code int32, msg string) proto.Message
 type PbType2 func(data []byte) (int, []byte)
 
 // 路由器的处理映射
