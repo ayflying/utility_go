@@ -84,19 +84,17 @@ func (s *SocketV1) Load(serv *ghttp.Server, prefix string) {
 //	@Description:
 //	@receiver s
 //	@param conn
-func (s *SocketV1) OnConnect(ctx context.Context, conn *websocket.Conn) {
-
-	defer conn.Close()
+func (s *SocketV1) OnConnect(ctx context.Context, ws *websocket.Conn) {
 	id := guid.S()
-	ip := conn.RemoteAddr().String()
-	data := &WebsocketData{
+	ip := ws.RemoteAddr().String()
+	conn := &WebsocketData{
 		Uuid:   id,
-		Ws:     conn,
+		Ws:     ws,
 		Ctx:    ctx,
 		Groups: make([]string, 0),
 		RoomId: -1,
 	}
-	m.Set(id, data)
+	m.Set(id, conn)
 
 	//defer delete(Conn, id)
 
@@ -106,22 +104,23 @@ func (s *SocketV1) OnConnect(ctx context.Context, conn *websocket.Conn) {
 
 	//用户登录钩子执行
 	for _, connect := range OnConnectHandlers {
-		connect(data)
+		connect(conn)
 	}
 
 	for {
 		//进入当前连接线程拥堵
-		msgType, msg, err := conn.ReadMessage()
+		msgType, msg, err := ws.ReadMessage()
 		s.Type = msgType
 		if err != nil {
 			//客户端断开返回错误，断开当前连接
 			//g.Log().Error(ctx, err)
 			break
 		}
-		s.OnMessage(m.Get(id).(*WebsocketData), msg, msgType)
+		s.OnMessage(conn, msg, msgType)
 	}
 	//关闭连接触发
-	s.OnClose(data)
+
+	s.OnClose(conn)
 	g.Log().Debugf(ctx, "断开连接:uuid=%v,ip=%v", id, ip)
 }
 
