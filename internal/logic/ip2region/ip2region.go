@@ -1,7 +1,6 @@
 package ip2region
 
 import (
-	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -12,7 +11,8 @@ import (
 )
 
 var (
-	ctx = gctx.New()
+	ctx  = gctx.New()
+	wait = false
 )
 
 type sIp2region struct {
@@ -27,9 +27,9 @@ func New() *sIp2region {
 func init() {
 	service.RegisterIp2Region(New())
 
-	boot.AddFunc(func() {
-		service.Ip2Region().Load()
-	})
+	//boot.AddFunc(func() {
+	//	service.Ip2Region().Load()
+	//})
 }
 
 // Load 加载到内存中
@@ -39,10 +39,16 @@ func init() {
 func (s *sIp2region) Load() {
 	var err error
 
-	var url = "https://github.com/ayflying/resource/raw/refs/heads/main/attachment/ip2region.xdb"
 	var dbPath = "runtime/library/ip2region.xdb"
-
+	var url = "https://github.com/ayflying/resource/raw/refs/heads/main/attachment/ip2region.xdb"
+	if wait {
+		return
+	}
 	if gfile.IsEmpty(dbPath) {
+		wait = true
+		defer func() {
+			wait = false
+		}()
 		g.Log().Debug(ctx, "等待下载ip库文件")
 		//下载文件
 		putData, err2 := g.Client().Discovery(nil).Get(ctx, url)
@@ -71,6 +77,9 @@ func (s *sIp2region) Load() {
 }
 
 func (s *sIp2region) GetIp(ip string) (res []string) {
+	//初始化加载
+	s.Load()
+
 	res = make([]string, 5)
 	if s.searcher == nil {
 		return

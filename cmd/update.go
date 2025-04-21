@@ -119,8 +119,6 @@ var (
 						return
 					}
 				}
-				continue
-
 				g.Log().Debugf(ctx, "准备同步服务器:%v,url=%v", v.Name, address+"/callback/update")
 				get, err := client.Post(ctx, address+"/callback/update", &UpdateReq{
 					FileUrl: url[v.S3],

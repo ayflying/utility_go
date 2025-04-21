@@ -337,8 +337,8 @@ func (s *SocketV1) OnClose(conn *WebsocketData) {
 	// 1. 更新连接状态或从连接池移除
 	// 2. 发送通知或清理关联资源
 	// 3. 执行特定于业务的断开处理
-	m.Remove(conn.Uuid)
 	conn.Ws.Close()
+	m.Remove(conn.Uuid)
 }
 
 // 是否在线
