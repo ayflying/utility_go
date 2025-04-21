@@ -14,6 +14,7 @@ import (
 	"github.com/gogf/gf/v2/util/guid"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/proto"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -57,14 +58,21 @@ type SocketInterface interface {
 func (s *SocketV1) Load(serv *ghttp.Server, prefix string) {
 	//websocket服务启动
 	serv.Group(prefix, func(group *ghttp.RouterGroup) {
-
 		var websocketCfg = websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				// In production, you should implement proper origin checking
+				return true
+			},
+			Error: func(w http.ResponseWriter, r *http.Request, status int, reason error) {
+				g.Log().Errorf(r.Context(), "WebSocket error: %v", reason)
+			},
 		}
 		group.Bind(
 			func(r *ghttp.Request) {
 				ctx := r.Context()
+
 				ws, err := websocketCfg.Upgrade(r.Response.Writer, r.Request, nil)
 				if err != nil {
 					glog.Error(ctx, err)
