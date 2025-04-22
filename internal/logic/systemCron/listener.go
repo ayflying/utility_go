@@ -7,6 +7,7 @@ import (
 	"github.com/ayflying/utility_go/pkg/notice"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/gclient"
+	"github.com/gogf/gf/v2/os/gctx"
 )
 
 type Status struct {
@@ -22,10 +23,10 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 		Name    string
 		Address string
 	}
-	cfg, _ := g.Cfg().Get(ctx, "serverList")
+	cfg, _ := g.Cfg().Get(gctx.New(), "serverList")
 	cfg.Scan(&list)
 	for _, v := range list {
-		get, err := g.Client().Discovery(nil).Get(ctx, v.Address+"/callback/status")
+		get, err := g.Client().Discovery(nil).Get(gctx.New(), v.Address+"/callback/status")
 
 		defer get.Close()
 		if err != nil {

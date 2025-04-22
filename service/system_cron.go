@@ -34,6 +34,13 @@ type (
 		//	@receiver s
 		//	@return err
 		StartCron() (err error)
+		// AddFuncChan 添加方法到通道
+		AddFuncChan(list []func() error)
+		// RunFuncChan 统一执行方法
+		RunFuncChan()
+		// RunFunc 统一执行方法
+		// deprecated: 弃用，会造成周期任务并发执行，to service.SystemCron().AddFuncChan
+		RunFunc(list []func() error)
 	}
 )
 
