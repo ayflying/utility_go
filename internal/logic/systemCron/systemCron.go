@@ -22,42 +22,44 @@ var (
 // 它包含了不同时间周期的任务，如秒、分钟、小时、天、周、月、年以及特定的工作日任务。
 type sSystemCron struct {
 	//互斥锁
-	Lock     sync.Mutex
-	taskChan chan func() error
+	Lock        sync.Mutex
+	taskChan    chan func(context.Context) error
+	TaskTimeout time.Duration
 
 	// 每秒执行的任务
-	SecondlyTask []func() error
+	SecondlyTask []func(context.Context) error
 	// 每分钟执行的任务
-	MinutelyTask []func() error
+	MinutelyTask []func(context.Context) error
 	// 每小时执行的任务
-	HourlyTask []func() error
+	HourlyTask []func(context.Context) error
 	// 每天执行的任务
-	DailyTask []func() error
+	DailyTask []func(context.Context) error
 	// 每周执行的任务
-	WeeklyTask []func() error
+	WeeklyTask []func(context.Context) error
 	// 每月执行的任务
-	MonthlyTask []func() error
+	MonthlyTask []func(context.Context) error
 	// 每年执行的任务
-	YearlyTask []func() error
+	YearlyTask []func(context.Context) error
 	// 每周一执行的任务
-	MondayTask []func() error
+	MondayTask []func(context.Context) error
 	// 每周二执行的任务
-	TuesdayTask []func() error
+	TuesdayTask []func(context.Context) error
 	// 每周三执行的任务
-	WednesdayTask []func() error
+	WednesdayTask []func(context.Context) error
 	// 每周四执行的任务
-	ThursdayTask []func() error
+	ThursdayTask []func(context.Context) error
 	// 每周五执行的任务
-	FridayTask []func() error
+	FridayTask []func(context.Context) error
 	// 每周六执行的任务
-	SaturdayTask []func() error
+	SaturdayTask []func(context.Context) error
 	// 每周日执行的任务
-	SundayTask []func() error
+	SundayTask []func(context.Context) error
 }
 
 func New() *sSystemCron {
 	return &sSystemCron{
-		taskChan: make(chan func() error, 1),
+		taskChan:    make(chan func(context.Context) error, 2),
+		TaskTimeout: time.Minute * 30,
 	}
 }
 
@@ -68,10 +70,26 @@ func init() {
 // AddCron 添加一个定时任务到相应的调度列表中。
 //
 // @Description: 根据指定的类型将函数添加到不同的任务列表中，以供后续执行。
+// 确保自定义任务正确处理上下文取消信号，即可充分发挥超时打断功能。
 // @receiver s: sSystemCron的实例，代表一个调度系统。
 // @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
 // @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
+// deprecated: 弃用，请使用 AddCronV2
 func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
+	//转换为带上下文的，提供打断
+	var _func2 = func(ctx context.Context) error {
+		return _func()
+	}
+	s.AddCronV2(typ, _func2)
+}
+
+// AddCronV2  添加一个定时任务到相应的调度列表中。
+//
+// @Description: 根据指定的类型将函数添加到不同的任务列表中，以供后续执行。
+// @receiver s: sSystemCron的实例，代表一个调度系统。
+// @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
+// @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
+func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error) {
 	//加锁
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
@@ -240,7 +258,7 @@ func (s *sSystemCron) dailyTask() {
 
 // 每周任务
 func (s *sSystemCron) weeklyTask(day int) {
-	var arr []func() error
+	var arr []func(context.Context) error
 	switch day {
 	case 1:
 		arr = s.MondayTask
@@ -287,7 +305,7 @@ func (s *sSystemCron) yearlyTask() {
 }
 
 // AddFuncChan 添加方法到通道
-func (s *sSystemCron) AddFuncChan(list []func() error) {
+func (s *sSystemCron) AddFuncChan(list []func(context.Context) error) {
 	for _, v := range list {
 		s.taskChan <- v
 	}
@@ -297,30 +315,35 @@ func (s *sSystemCron) AddFuncChan(list []func() error) {
 func (s *sSystemCron) RunFuncChan() {
 	go func() {
 		for task := range s.taskChan {
-			ctx := gctx.New()
+			//ctx := gctx.New()
 			func() {
+				//超时释放资源
+				ctx, cancel := context.WithTimeout(context.Background(), s.TaskTimeout)
+				defer cancel()
+
 				// 使用匿名函数包裹来捕获 panic
 				defer func() {
 					if r := recover(); r != nil {
-						g.Log().Errorf(ctx, "执行函数时发生 panic: %v", r)
+						g.Log().Errorf(gctx.New(), "执行函数时发生 panic: %v", r)
 					}
 				}()
-				var taskErr error
+
 				done := make(chan error)
 				go func() {
-					done <- task()
+					done <- task(ctx)
 				}()
 				//err := task()
 				//if err != nil {
 				//	g.Log().Error(ctx, err)
 				//}
 				select {
-				case taskErr = <-done:
+				case taskErr := <-done:
 					if taskErr != nil {
-						g.Log().Error(ctx, taskErr)
+						// 使用新上下文记录错误
+						g.Log().Error(gctx.New(), taskErr)
 					}
-				case <-time.After(time.Minute * 10):
-					g.Log().Errorf(ctx, "task timeout:%v", task)
+				case <-ctx.Done(): // 监听上下文取消（包括超时）
+					g.Log().Errorf(gctx.New(), "task timeout:%v", ctx.Err())
 				}
 			}()
 		}

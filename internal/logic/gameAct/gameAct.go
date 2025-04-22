@@ -1,6 +1,7 @@
 package gameAct
 
 import (
+	"context"
 	"fmt"
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
@@ -105,16 +106,16 @@ func (s *sGameAct) Set(uid int64, actId int, data interface{}) (err error) {
 	return
 }
 
-func (s *sGameAct) Saves() (err error) {
+func (s *sGameAct) Saves(ctx context.Context) (err error) {
 	//遍历执行
 	ActList.Iterator(func(i interface{}) bool {
-		err = s.Save(i.(int))
+		err = s.Save(ctx, i.(int))
 		return true
 	})
 	return
 }
 
-func (s *sGameAct) Save(actId int) (err error) {
+func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 	cacheKey := fmt.Sprintf("act:%v:*", actId)
 	//获取当前用户的key值
@@ -149,8 +150,8 @@ func (s *sGameAct) Save(actId int) (err error) {
 			}
 
 			//如果有活跃，跳过持久化
-			if getBool, _ := pkg.Cache("redis").Contains(ctx,
-				fmt.Sprintf("act:update:%d", uid)); getBool {
+			if getBool, _ := pkg.Cache("redis").
+				Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
 				continue
 			}
 

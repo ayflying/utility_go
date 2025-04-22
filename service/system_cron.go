@@ -6,6 +6,8 @@
 package service
 
 import (
+	"context"
+
 	v1 "github.com/ayflying/utility_go/api/system/v1"
 	"github.com/gogf/gf/v2/net/gclient"
 )
@@ -24,10 +26,19 @@ type (
 		// AddCron 添加一个定时任务到相应的调度列表中。
 		//
 		// @Description: 根据指定的类型将函数添加到不同的任务列表中，以供后续执行。
+		// 确保自定义任务正确处理上下文取消信号，即可充分发挥超时打断功能。
 		// @receiver s: sSystemCron的实例，代表一个调度系统。
 		// @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
 		// @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
+		// deprecated: 弃用，请使用 AddCronV2
 		AddCron(typ v1.CronType, _func func() error)
+		// AddCronV2  添加一个定时任务到相应的调度列表中。
+		//
+		// @Description: 根据指定的类型将函数添加到不同的任务列表中，以供后续执行。
+		// @receiver s: sSystemCron的实例，代表一个调度系统。
+		// @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
+		// @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
+		AddCronV2(typ v1.CronType, _func func(context.Context) error)
 		// StartCron 开始计划任务执行
 		//
 		//	@Description:
@@ -35,7 +46,7 @@ type (
 		//	@return err
 		StartCron() (err error)
 		// AddFuncChan 添加方法到通道
-		AddFuncChan(list []func() error)
+		AddFuncChan(list []func(context.Context) error)
 		// RunFuncChan 统一执行方法
 		RunFuncChan()
 		// RunFunc 统一执行方法

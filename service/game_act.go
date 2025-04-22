@@ -6,6 +6,8 @@
 package service
 
 import (
+	"context"
+
 	"github.com/gogf/gf/v2/frame/g"
 )
 
@@ -29,8 +31,8 @@ type (
 		// @param data interface{}: 要存储的活动信息数据。
 		// @return err error: 返回错误信息，如果操作成功，则返回nil。
 		Set(uid int64, actId int, data interface{}) (err error)
-		Saves() (err error)
-		Save(actId int) (err error)
+		Saves(ctx context.Context) (err error)
+		Save(ctx context.Context, actId int) (err error)
 		// 清空GetRedDot缓存
 		RefreshGetRedDotCache(uid int64)
 		Del(uid int64, actId int)
