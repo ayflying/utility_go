@@ -37,7 +37,7 @@ type WebsocketData struct {
 	Uid    int64           `json:"uid" dc:"用户编号"`
 	Groups []string        `json:"groups" dc:"群组"`
 	Ctx    context.Context `json:"ctx" dc:""`
-	RoomId int             `json:"roomId" dc:"房间编号"`
+	RoomId string          `json:"roomId" dc:"房间编号"`
 }
 
 func NewV1() *SocketV1 {
@@ -100,7 +100,7 @@ func (s *SocketV1) OnConnect(ctx context.Context, ws *websocket.Conn) {
 		Ws:     ws,
 		Ctx:    ctx,
 		Groups: make([]string, 0),
-		RoomId: -1,
+		RoomId: "",
 	}
 	m.Set(id, conn)
 
