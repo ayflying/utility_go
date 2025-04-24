@@ -1,13 +1,17 @@
 package gameKv
 
 import (
+	"fmt"
+	"github.com/ayflying/utility_go/pkg"
 	"github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gtime"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -25,10 +29,6 @@ func New() *sGameKv {
 
 func init() {
 	service.RegisterGameKv(New())
-
-	//支付钩子
-	//task.Task.Trigger(tasks.TaskType_PAY, service.GameKv().HookPay)
-	//task.Task.Trigger(tasks.TaskType_WARDROBE_LEVEL, service.GameKv().HookLevelRwd)
 }
 
 // SavesV1 方法
@@ -37,6 +37,14 @@ func init() {
 // @receiver s: sGameKv的实例。
 // @return err: 错误信息，如果操作成功，则为nil。
 func (s *sGameKv) SavesV1() (err error) {
+	getCache, err := pkg.Cache("redis").Get(nil, "cron:game_kv")
+	//如果没有执行过，设置时间戳
+	if getCache.Int64() > 0 {
+		return
+	} else {
+		pkg.Cache("redis").Set(nil, "cron:game_kv", gtime.Now().Unix(), time.Hour)
+	}
+
 	// 从Redis列表中获取所有用户KV索引的键
 	//keys, err := utils.RedisScan("user:kv:*")
 	err = tools.Redis.RedisScanV2("user:kv:*", func(keys []string) (err error) {
@@ -69,12 +77,17 @@ func (s *sGameKv) SavesV1() (err error) {
 			//if user.UpdatedAt.Seconds < gtime.Now().Add(consts.ActSaveTime).Unix() {
 			//	continue
 			//}
+			//如果有活跃，跳过持久化
+			if getBool, _ := pkg.Cache("redis").
+				Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
+				continue
+			}
 
 			get, _ := g.Redis().Get(ctx, cacheKey)
 			var data interface{}
 			get.Scan(&data)
 			list = append(list, &ListData{
-				Uid: int64(uid),
+				Uid: uid,
 				Kv:  data,
 			})
 

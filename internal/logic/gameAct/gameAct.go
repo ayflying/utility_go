@@ -107,6 +107,14 @@ func (s *sGameAct) Set(uid int64, actId int, data interface{}) (err error) {
 }
 
 func (s *sGameAct) Saves(ctx context.Context) (err error) {
+	getCache, _ := pkg.Cache("redis").Get(nil, "cron:game_act")
+	//如果没有执行过，设置时间戳
+	if getCache.Int64() > 0 {
+		return
+	} else {
+		pkg.Cache("redis").Set(nil, "cron:game_act", gtime.Now().Unix(), time.Hour)
+	}
+
 	//遍历执行
 	ActList.Iterator(func(i interface{}) bool {
 		err = s.Save(ctx, i.(int))

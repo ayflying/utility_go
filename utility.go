@@ -17,6 +17,7 @@ func init() {
 	g.Log().Debug(ctx, "utility_go init启动完成")
 	// 初始化配置
 	var err = boot.Boot()
+
 	if err != nil {
 		panic(err)
 	}

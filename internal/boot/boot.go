@@ -17,7 +17,9 @@ func Boot() (err error) {
 
 	//用户活动持久化
 	service.SystemCron().AddCronV2(v1.CronType_DAILY, func(ctx context.Context) error {
-		return service.GameAct().Saves(ctx)
+		err = service.GameKv().SavesV1()
+		err = service.GameAct().Saves(ctx)
+		return err
 	})
 
 	//初始化自启动方法
