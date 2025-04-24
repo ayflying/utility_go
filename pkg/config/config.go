@@ -18,26 +18,40 @@ import (
 var (
 	//ApolloCfg      *apolloConfig.AppConfig
 	ApolloCfg      *apollo.Config
+	// ApolloListener 存储需要监听的 Apollo 配置项名称
 	ApolloListener []string
+	// Item2Obj 存储配置项名称和对应的加载器对象的映射
 	Item2Obj       = map[string]Load{}
 )
 
-// load接口定义了Load方法，用于加载数据
+// Load 接口定义了 Load 方法，用于加载数据
 type Load interface {
+	// Load 方法用于加载配置数据，支持传入可选的配置参数
 	Load(cfg ...string)
 }
 
+// NewV1 创建一个新的 Cfg 实例
 func NewV1() *Cfg {
 	return &Cfg{}
 }
 
+// Cfg 结构体包含配置操作的相关方法
 type Cfg struct {
+	// Lock 用于保证并发安全的互斥锁
 	Lock sync.Mutex
 }
 
+// GetDbFile 从数据库中获取指定名称的配置文件
+// 参数:
+//   name - 配置文件的名称
+// 返回值:
+//   *g.Var - 存储配置数据的变量
+//   error  - 操作过程中遇到的错误
 func (c *Cfg) GetDbFile(name string) (res *g.Var, err error) {
+	// 从数据库的 game_config 表中查询指定名称的配置数据
 	get2, err := g.Model("game_config").
 		Where("name", name).Master().Value("data")
+	// 将查询结果扫描到 res 变量中
 	err = get2.Scan(&res)
 	if res == nil {
 		res = &gvar.Var{}
@@ -45,107 +59,81 @@ func (c *Cfg) GetDbFile(name string) (res *g.Var, err error) {
 	return
 }
 
-func (c *Cfg) GetFile(filename string, obj ...Load) (jsonObj *gjson.Json, err error) {
+// GetFile 从文件系统或资源文件中加载 JSON 配置
+// 参数:
+//   filename   - 需要加载的配置文件名（不带扩展名）
+//   _pathStr   - 可选参数，指定配置文件目录路径，默认"manifest/game/"
+// 返回值:
+//   *gjson.Json - 解析后的 JSON 对象
+//   error       - 文件加载或解析过程中遇到的错误
+func (c *Cfg) GetFile(filename string, _pathStr ...string) (jsonObj *gjson.Json, err error) {
+	// 处理路径参数，使用默认路径或传入参数
 	pathStr := "manifest/game/"
+	if len(_pathStr) > 0 {
+		pathStr = _pathStr[0]
+	}
+	// 拼接完整的文件路径
 	filePath := pathStr + filename + ".json"
-	//err := gres.Load(pathStr + filename)
 
-	//载入静态资源到文件对象
+	// 载入静态资源到文件对象
 	err = gres.Load(filePath)
 	var bytes []byte
 
+	// 优先从文件系统读取，不存在时从资源文件读取
 	if gfile.IsFile(filePath) {
-		bytes = gfile.GetBytes(filePath)
+		bytes = gfile.GetBytes(filePath) // 读取物理文件内容
 	} else {
-		bytes = gres.GetContent(filePath)
+		bytes = gres.GetContent(filePath) // 从打包资源中获取内容
 	}
 
+	// 解析 JSON 内容并返回结果
 	jsonObj, err = gjson.DecodeToJson(bytes)
-	//g.Dump(filePath, jsonObj)
 	return
 }
 
-// getUrlFile 获取远程配置
+// GetUrlFile 获取远程配置
+// 参数:
+//   name - 配置文件的名称
+// 返回值:
+//   *gjson.Json - 解析后的 JSON 对象
+//   error       - 请求或解析过程中遇到的错误
 func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
+	// 拼接远程配置文件的 URL
 	urlStr := fmt.Sprintf("http://sdf.sdfs.sdf/%s.json", name)
+	// 发送 HTTP 请求获取远程配置数据
 	getUrl, err := g.Client().Discovery(nil).Get(nil, urlStr)
+	// 读取响应内容
 	bytes := getUrl.ReadAll()
+	// 解析 JSON 内容并返回结果
 	jsonObj, err = gjson.DecodeToJson(bytes)
 	return
 }
 
-// 获取阿波罗
-//func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
-//	jsonObj, err = c.GetApolloV2(name, obj)
-//	return
-//
-//	//c.Lock.Lock()
-//	//defer c.Lock.Unlock()
-//	//
-//	//Item2Obj[name+".json"] = obj
-//	//var cfg = apolloConfig.AppConfig{
-//	//	AppID:             ApolloCfg.AppID,
-//	//	Cluster:           ApolloCfg.Cluster,
-//	//	IP:                ApolloCfg.IP,
-//	//	NamespaceName:     name + ".json",
-//	//	Secret:            ApolloCfg.Secret,
-//	//	IsBackupConfig:    ApolloCfg.IsBackupConfig,
-//	//	BackupConfigPath:  ApolloCfg.BackupConfigPath,
-//	//	SyncServerTimeout: 60,
-//	//	MustStart:         true,
-//	//}
-//	////cfg.NamespaceName = name + ".json"
-//	//
-//	//client, err := agollo.StartWithConfig(func() (*apolloConfig.AppConfig, error) {
-//	//	return ApolloCfg, nil
-//	//})
-//	//if client == nil {
-//	//	return
-//	//}
-//	//var getStr string
-//	//var getApollo *storage.Config
-//	//for range 5 {
-//	//	getApollo = client.GetConfig(cfg.NamespaceName)
-//	//	if getApollo != nil {
-//	//		break
-//	//	}
-//	//	time.Sleep(time.Second * 5)
-//	//}
-//	//
-//	//if getApollo != nil {
-//	//	getStr = getApollo.GetValue("content")
-//	//	if getStr != "" {
-//	//		//写入配置
-//	//		gfile.PutContents(path.Join("manifest", "game", name+".json"), getStr)
-//	//	}
-//	//} else {
-//	//	jsonObj, err = c.GetFile(name)
-//	//}
-//	//jsonObj, err = gjson.DecodeToJson(getStr)
-//	////首次运行加入监听器
-//	//if !gstr.InArray(ApolloListener, name) {
-//	//	c2 := &CustomChangeListener{}
-//	//	client.AddChangeListener(c2)
-//	//	ApolloListener = append(ApolloListener, name)
-//	//}
-//	//return
-//}
-
+// GetApollo 从 Apollo 配置中心获取指定名称的配置
+// 参数:
+//   name - 配置文件的名称
+//   obj  - 实现了 Load 接口的加载器对象
+// 返回值:
+//   *gjson.Json - 解析后的 JSON 对象
+//   error       - 操作过程中遇到的错误
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
+	// 将配置项名称和对应的加载器对象存入映射
 	Item2Obj[name+".json"] = obj
 
-	// 接入阿波罗配置
+	// 接入 Apollo 配置
 	ApolloCfg.NamespaceName = name + ".json"
+	// 创建 Apollo 配置适配器
 	adapter, err := apollo.New(nil, *ApolloCfg)
 	if err != nil {
+		// 配置适配器创建失败，记录致命错误日志
 		g.Log().Fatalf(nil, `%+v`, err)
 	}
-	// Change the adapter of default configuration instance.
+	// 更改默认配置实例的适配器
 	g.Cfg(name).SetAdapter(adapter)
 
-	//首次运行加入监听器
+	// 首次运行加入监听器
 	if !gstr.InArray(ApolloListener, name+".json") {
-		//放置监听器
+		// 启动 Apollo 客户端
 		client, _ := agollo.StartWithConfig(func() (*apolloConfig.AppConfig, error) {
 			return &apolloConfig.AppConfig{
 				AppID:             ApolloCfg.AppID,
@@ -159,31 +147,40 @@ func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) 
 				MustStart:         ApolloCfg.MustStart,
 			}, nil
 		})
+		// 创建自定义监听器实例
 		c2 := &CustomChangeListener{}
+		// 为 Apollo 客户端添加监听器
 		client.AddChangeListener(c2)
+		// 将配置项名称添加到监听器列表
 		ApolloListener = append(ApolloListener, name+".json")
 	}
 
+	// 从配置中心获取指定配置项的值
 	cfg, err := g.Cfg(name).Get(nil, "content")
+	// 将配置值扫描到 jsonObj 中
 	cfg.Scan(&jsonObj)
 	return
 }
 
-// 阿波罗监听器
+// CustomChangeListener 是 Apollo 配置变化的自定义监听器
 type CustomChangeListener struct {
+	// wg 用于等待所有处理任务完成
 	wg sync.WaitGroup
 }
 
+// OnChange 当 Apollo 配置发生变化时触发
 func (c *CustomChangeListener) OnChange(changeEvent *storage.ChangeEvent) {
+	// 记录配置变化的日志
 	g.Log().Debugf(nil, "当前Namespace变化了：%v", changeEvent.Namespace)
+	// 获取变化的配置项名称
 	filename := changeEvent.Namespace
 	if obj, ok := Item2Obj[filename]; ok {
-		//重载配置文件
+		// 重载配置文件
 		obj.Load(changeEvent.Changes["content"].NewValue.(string))
 	}
 }
 
+// OnNewestChange 当获取到最新配置时触发，当前为空实现
 func (c *CustomChangeListener) OnNewestChange(event *storage.FullChangeEvent) {
 	//write your code here
-
 }
