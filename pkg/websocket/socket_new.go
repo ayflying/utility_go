@@ -35,6 +35,7 @@ type WebsocketData struct {
 	Ws     *websocket.Conn `json:"ws" dc:"websocket连接池"`
 	Uuid   string          `json:"uuid" dc:"用户唯一标识"`
 	Uid    int64           `json:"uid" dc:"用户编号"`
+	Guid   string          `json:"guid" dc:"用户凭证"`
 	Groups []string        `json:"groups" dc:"群组"`
 	Ctx    context.Context `json:"ctx" dc:""`
 	RoomId string          `json:"roomId" dc:"房间编号"`
@@ -169,7 +170,7 @@ func (s *SocketV1) OnMessage(conn *WebsocketData, req []byte, msgType int) {
 }
 
 //绑定用户编号
-func (s *SocketV1) BindUid(conn *WebsocketData, uid int64) {
+func (s *SocketV1) BindUid(conn *WebsocketData, uid int64, guid string) {
 	lock.Lock()
 	defer lock.Unlock()
 
@@ -179,6 +180,7 @@ func (s *SocketV1) BindUid(conn *WebsocketData, uid int64) {
 	if conn.Uid == 0 {
 		conn.Uid = uid
 	}
+	conn.Guid = guid
 
 }
 
