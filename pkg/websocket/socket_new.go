@@ -308,8 +308,8 @@ func (s *SocketV1) LeaveGroup(conn *WebsocketData, group string) {
 }
 
 //群组广播
-func (s *SocketV1) SendGroup(cmd int32, group string, req proto.Message) {
-	cacheKey := "websocket:group:" + group
+func (s *SocketV1) SendGroup(cmd int32, roomId string, req proto.Message) {
+	cacheKey := "websocket:group:" + roomId
 	get, _ := cache.Get(gctx.New(), cacheKey)
 	var list = make(map[int64]string)
 	if !get.IsNil() {
