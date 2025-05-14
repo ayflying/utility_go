@@ -27,26 +27,26 @@ type Cfg struct {
 
 // Deprecated : pkg.Config().GetDbFile(name)
 func (c *Cfg) GetDbFile(name string) (res *g.Var, err error) {
-	pkg.Config().GetDbFile(name)
+	res, err = pkg.Config().GetDbFile(name)
 	return
 }
 
 // Deprecated : pkg.Config().GetFile(name, obj...)
 func (c *Cfg) GetFile(filename string, obj ...Load) (jsonObj *gjson.Json, err error) {
-	pkg.Config().GetFile(filename)
+	jsonObj, err = pkg.Config().GetFile(filename)
 	return
 }
 
 // getUrlFile 获取远程配置
 // Deprecated : pkg.Config().GetUrlFile(name)
 func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
-	pkg.Config().GetUrlFile(name)
+	jsonObj, err = pkg.Config().GetUrlFile(name)
 	return
 }
 
 // Deprecated : pkg.Config().GetApollo(name, obj)
 func (c *Cfg) GetApollo(name string, obj Load) (jsonObj *gjson.Json, err error) {
-	pkg.Config().GetApollo(name, obj)
+	jsonObj, err = pkg.Config().GetApollo(name, obj)
 	return
 }
 
