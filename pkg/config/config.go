@@ -88,8 +88,8 @@ func (c *Cfg) GetFile(filename string, _pathStr ...string) (jsonObj *gjson.Json,
 
 	//如果还是没有读取到配置，从当前目录返回上级读取
 	if bytes == nil {
-		// 拼接完整的文件路径
-		filePath = "../../" + pathStr + filename + ".json"
+		// 上级拼接完整的文件路径
+		filePath = "../../" + filePath
 		if gfile.IsFile(filePath) {
 			bytes = gfile.GetBytes(filePath) // 读取物理文件内容
 		}
