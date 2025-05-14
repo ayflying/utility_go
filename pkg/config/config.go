@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gres"
 	"github.com/gogf/gf/v2/text/gstr"
@@ -97,6 +98,9 @@ func (c *Cfg) GetFile(filename string, _pathStr ...string) (jsonObj *gjson.Json,
 				break
 			}
 		}
+	}
+	if bytes == nil {
+		g.Log().Errorf(gctx.New(), "未读取到配置文件：%v", filePath)
 	}
 
 	// 解析 JSON 内容并返回结果
