@@ -17,11 +17,11 @@ import (
 
 var (
 	//ApolloCfg      *apolloConfig.AppConfig
-	ApolloCfg      *apollo.Config
+	ApolloCfg *apollo.Config
 	// ApolloListener 存储需要监听的 Apollo 配置项名称
 	ApolloListener []string
 	// Item2Obj 存储配置项名称和对应的加载器对象的映射
-	Item2Obj       = map[string]Load{}
+	Item2Obj = map[string]Load{}
 )
 
 // Load 接口定义了 Load 方法，用于加载数据
@@ -86,6 +86,14 @@ func (c *Cfg) GetFile(filename string, _pathStr ...string) (jsonObj *gjson.Json,
 		bytes = gres.GetContent(filePath) // 从打包资源中获取内容
 	}
 
+	//如果还是没有读取到配置，从当前目录返回上级读取
+	if bytes == nil {
+		// 拼接完整的文件路径
+		filePath = "../../" + pathStr + filename + ".json"
+		if gfile.IsFile(filePath) {
+			bytes = gfile.GetBytes(filePath) // 读取物理文件内容
+		}
+	}
 	// 解析 JSON 内容并返回结果
 	jsonObj, err = gjson.DecodeToJson(bytes)
 	return
