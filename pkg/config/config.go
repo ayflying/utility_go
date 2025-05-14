@@ -86,14 +86,19 @@ func (c *Cfg) GetFile(filename string, _pathStr ...string) (jsonObj *gjson.Json,
 		bytes = gres.GetContent(filePath) // 从打包资源中获取内容
 	}
 
-	//如果还是没有读取到配置，从当前目录返回上级读取
-	if bytes == nil {
-		// 上级拼接完整的文件路径
-		filePath = "../../" + filePath
-		if gfile.IsFile(filePath) {
-			bytes = gfile.GetBytes(filePath) // 读取物理文件内容
+	for range 5 {
+		//如果还是没有读取到配置，从当前目录返回上级读取
+		if bytes == nil {
+			// 上级拼接完整的文件路径
+			filePath = "../" + filePath
+			if gfile.IsFile(filePath) {
+				bytes = gfile.GetBytes(filePath) // 读取物理文件内容
+				//找到配置了，跳过
+				break
+			}
 		}
 	}
+
 	// 解析 JSON 内容并返回结果
 	jsonObj, err = gjson.DecodeToJson(bytes)
 	return
