@@ -136,6 +136,10 @@ func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) err
 //	@receiver s
 //	@return err
 func (s *sSystemCron) StartCron() (err error) {
+	//如果没有数据库配置，跳过计划任务执行
+	if g.Cfg().MustGet(gctx.New(), "database") == nil {
+		return
+	}
 	//预防重复启动
 	if startTime != nil {
 		return
