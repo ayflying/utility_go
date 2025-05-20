@@ -8,7 +8,7 @@ import (
 	"github.com/ayflying/utility_go/pkg/notice"
 	"github.com/ayflying/utility_go/pkg/rank"
 	"github.com/ayflying/utility_go/pkg/s3"
-	"github.com/ayflying/utility_go/pkg/websocket"
+	//"github.com/ayflying/utility_go/pkg/websocket"
 	"github.com/gogf/gf/v2/os/gcache"
 )
 
@@ -32,9 +32,9 @@ func Rank() *rank.Mod {
 	return rank.New()
 }
 
-func Websocket() *websocket.SocketV1 {
-	return websocket.NewV1()
-}
+//func Websocket() *websocket.SocketV1 {
+//	return websocket.NewV1()
+//}
 
 func Config() *config.Cfg {
 	return config.NewV1()
