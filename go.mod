@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/apolloconfig/agollo/v4 v4.4.0
-	github.com/ayflying/excel2json v1.1.7
+	github.com/ayflying/excel2json v1.1.8
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
 	github.com/go-pay/crypto v0.0.1
 	github.com/go-pay/gopay v1.5.109
@@ -12,7 +12,6 @@ require (
 	github.com/goccy/go-json v0.10.5
 	github.com/gogf/gf/contrib/config/apollo/v2 v2.9.0
 	github.com/gogf/gf/v2 v2.9.0
-	github.com/gorilla/websocket v1.5.3
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20241220152942-06eb5c6e8230
 	github.com/minio/minio-go/v7 v7.0.91
 	github.com/prometheus/client_golang v1.22.0
@@ -45,6 +44,7 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
