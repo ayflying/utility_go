@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/apolloconfig/agollo/v4 v4.4.0
-	github.com/ayflying/excel2json v1.1.8
+	github.com/ayflying/excel2json v1.1.9
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
 	github.com/go-pay/crypto v0.0.1
 	github.com/go-pay/gopay v1.5.109

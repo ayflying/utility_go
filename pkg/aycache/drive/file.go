@@ -6,6 +6,7 @@ import (
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -80,7 +81,7 @@ func (a *AdapterFile) DelIndex(FileName interface{}) {
 		arr := strings.Split(text, "|")
 		if arr[0] == FileName {
 			//save = true
-			err = gfile.ReplaceFile(text, "", fileIndex)
+			err = gfile.ReplaceFile(text+"\n", "", fileIndex)
 			return
 		}
 
@@ -248,7 +249,23 @@ func (a *AdapterFile) Close(ctx context.Context) error {
 
 func NewAdapterFile(filePath string) gcache.Adapter {
 	fileIndex = path.Join(filePath, fileIndex)
-	return &AdapterFile{
+
+	//清空过期文件目录
+	delKeys := make([]interface{}, 0)
+	gfile.ReadLines(fileIndex, func(text string) error {
+		arr := strings.Split(text, "|")
+		if gtime.Now().Unix() > gconv.Int64(arr[1]) {
+			delKeys = append(delKeys, arr[0])
+		}
+		return nil
+	})
+
+	obj := &AdapterFile{
 		FilePath: filePath,
 	}
+	if len(delKeys) > 0 {
+		obj.Remove(gctx.New(), delKeys...)
+	}
+
+	return obj
 }
