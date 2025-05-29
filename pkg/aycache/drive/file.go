@@ -185,11 +185,12 @@ func (a *AdapterFile) Data(ctx context.Context) (data map[interface{}]interface{
 }
 
 func (a *AdapterFile) Keys(ctx context.Context) (keys []interface{}, err error) {
+	keys = make([]interface{}, 0)
 	gfile.ReadLines(fileIndex, func(text string) (err error) {
-
+		arr := strings.Split(text, "|")
+		keys = append(keys, arr[0])
 		return
 	})
-
 	return
 }
 
