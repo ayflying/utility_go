@@ -31,6 +31,7 @@ type DataType struct {
 	Url           string `json:"url"`             // S3 服务的访问 URL
 	BucketName    string `json:"bucket_name"`     // 默认存储桶名称
 	BucketNameCdn string `json:"bucket_name_cdn"` // CDN 存储桶名称
+	Provider      string `json:"provider"`        // S3 服务的提供方
 }
 
 // Mod 定义了 S3 模块的结构体，包含一个 S3 客户端实例和配置信息
@@ -139,7 +140,7 @@ func (s *Mod) PutObject(f io.Reader, name string, bucketName string, _size ...in
 	}
 	// 调用 S3 客户端上传文件，设置内容类型为 "application/octet-stream"
 	res, err = s.client.PutObject(ctx, bucketName, name, f, size, minio.PutObjectOptions{
-		ContentType: "application/octet-stream",
+		//ContentType: "application/octet-stream",
 	})
 	if err != nil {
 		// 记录上传错误日志
@@ -191,9 +192,14 @@ func (s *Mod) GetUrl(filePath string, defaultFile ...string) (url string) {
 		filePath = defaultFile[0]
 	}
 
-	if s.cfg.Ssl {
+	switch s.cfg.Provider {
+	case "qiniu":
+		url = get + path.Join(bucketName, filePath)
+	default:
 		url = get + filePath
-	} else {
+	}
+
+	if !s.cfg.Ssl {
 		url = get + path.Join(bucketName, filePath)
 	}
 
