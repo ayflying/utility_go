@@ -24,12 +24,12 @@ var (
 
 // DataType 定义了 S3 配置的数据结构，用于存储访问 S3 所需的各种信息
 type DataType struct {
-	AccessKey     string `json:"access_key"` // 访问 S3 的密钥 ID
-	SecretKey     string `json:"secret_key"` // 访问 S3 的密钥
-	Address       string `json:"address"`    // S3 服务的地址
-	Ssl           bool   `json:"ssl"`        // 是否使用 SSL 加密连接
-	Url           string `json:"url"`        // S3 服务的访问 URL
-	BucketName    string `json:"bucket_name"` // 默认存储桶名称
+	AccessKey     string `json:"access_key"`      // 访问 S3 的密钥 ID
+	SecretKey     string `json:"secret_key"`      // 访问 S3 的密钥
+	Address       string `json:"address"`         // S3 服务的地址
+	Ssl           bool   `json:"ssl"`             // 是否使用 SSL 加密连接
+	Url           string `json:"url"`             // S3 服务的访问 URL
+	BucketName    string `json:"bucket_name"`     // 默认存储桶名称
 	BucketNameCdn string `json:"bucket_name_cdn"` // CDN 存储桶名称
 }
 
@@ -62,8 +62,9 @@ func New(_name ...string) *Mod {
 	obj, err := minio.New(
 		cfg.Address,
 		&minio.Options{
-			Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
-			Secure: cfg.Ssl,
+			Creds:        credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+			Secure:       cfg.Ssl,
+			BucketLookup: minio.BucketLookupPath,
 		},
 	)
 	if err != nil {
@@ -137,7 +138,9 @@ func (s *Mod) PutObject(f io.Reader, name string, bucketName string, _size ...in
 		size = _size[0]
 	}
 	// 调用 S3 客户端上传文件，设置内容类型为 "application/octet-stream"
-	res, err = s.client.PutObject(ctx, bucketName, name, f, size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	res, err = s.client.PutObject(ctx, bucketName, name, f, size, minio.PutObjectOptions{
+		ContentType: "application/octet-stream",
+	})
 	if err != nil {
 		// 记录上传错误日志
 		g.Log().Error(ctx, err)
@@ -148,6 +151,7 @@ func (s *Mod) PutObject(f io.Reader, name string, bucketName string, _size ...in
 // RemoveObject 从指定存储桶中删除指定名称的文件
 func (s *Mod) RemoveObject(name string, bucketName string) (err error) {
 	opts := minio.RemoveObjectOptions{
+		ForceDelete: true,
 		//GovernanceBypass: true,
 		//VersionID:        "myversionid",
 	}
