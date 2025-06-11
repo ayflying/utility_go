@@ -63,9 +63,9 @@ func New(_name ...string) *Mod {
 	obj, err := minio.New(
 		cfg.Address,
 		&minio.Options{
-			Creds:        credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
-			Secure:       cfg.Ssl,
-			BucketLookup: minio.BucketLookupPath,
+			Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+			Secure: cfg.Ssl,
+			//BucketLookup: minio.BucketLookupPath,
 		},
 	)
 	if err != nil {
@@ -135,9 +135,9 @@ func (s *Mod) ListBuckets() []minio.BucketInfo {
 func (s *Mod) PutObject(f io.Reader, name string, bucketName string, _size ...int64) (res minio.UploadInfo, err error) {
 	// 初始化文件大小为 -1，表示将读取文件至结束
 	var size = int64(-1)
-	if len(_size) > 0 {
-		size = _size[0]
-	}
+	//if len(_size) > 0 {
+	//	size = _size[0]
+	//}
 	// 调用 S3 客户端上传文件，设置内容类型为 "application/octet-stream"
 	res, err = s.client.PutObject(ctx, bucketName, name, f, size, minio.PutObjectOptions{
 		//ContentType: "application/octet-stream",
@@ -192,12 +192,13 @@ func (s *Mod) GetUrl(filePath string, defaultFile ...string) (url string) {
 		filePath = defaultFile[0]
 	}
 
-	switch s.cfg.Provider {
-	case "qiniu":
-		url = get + path.Join(bucketName, filePath)
-	default:
-		url = get + filePath
-	}
+	//switch s.cfg.Provider {
+	//case "qiniu":
+	//	url = get + path.Join(bucketName, filePath)
+	//default:
+	//	url = get + filePath
+	//}
+	url = get + filePath
 
 	if !s.cfg.Ssl {
 		url = get + path.Join(bucketName, filePath)
