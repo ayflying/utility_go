@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/ayflying/utility_go"
-	"github.com/gogf/gf/v2/util/gutil"
-	"sync"
+	"github.com/ayflying/utility_go/pkg"
+    "github.com/gogf/gf/v2/util/gutil"
+    "sync"
 )
 
 type {cfg}Cfg struct {
@@ -23,7 +23,7 @@ func (c *{mod}Mod) Load(_cfg ...string) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.cfgArr = make([]*{cfg}Cfg, 0)
-	data, err := utility_go.Config.GetFile("{file}")
+	data, err := pkg.Config().GetFile("{file}")
 	err = data.Scan(&c.cfgArr)
 	if err != nil {
 		panic(err)
