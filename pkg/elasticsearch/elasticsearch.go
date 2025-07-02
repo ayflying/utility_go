@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/typedapi/types"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 var (
@@ -21,6 +22,13 @@ var (
 type Elastic struct {
 	client *elasticsearch.TypedClient
 	name   string
+}
+
+type elkBulk struct {
+	Index struct {
+		Index string `json:"_index"`
+		Id    string `json:"_id"`
+	} `json:"index"`
 }
 
 func NewV1(name string) *Elastic {
@@ -52,7 +60,7 @@ func NewV1(name string) *Elastic {
 //	fmt.Printf("index:%#v\n", resp.Index)
 //}
 
-// Set 索引文档
+// Set 添加文档索引文档
 func (s *Elastic) Set(ctx context.Context, key string, data interface{}) (err error) {
 	// 添加文档
 	_, err = s.client.Index(s.name).Id(key).Document(data).Do(ctx)
@@ -61,11 +69,20 @@ func (s *Elastic) Set(ctx context.Context, key string, data interface{}) (err er
 
 // SetBulk 批量添加文档
 func (s *Elastic) SetBulk(ctx context.Context, data []any) (err error) {
-	var save *bulk.Request
-	save = &bulk.Request{
-		data,
+	var save bulk.Request
+	save = make(bulk.Request, 0)
+	for _, v := range data {
+		val := gconv.Map(v)
+		var saveIndex = elkBulk{}
+		saveIndex.Index.Index = s.name
+		if _, ok := val["uuid"]; ok {
+			saveIndex.Index.Id = val["uuid"].(string)
+		}
+		save = append(save, saveIndex)
+		save = append(save, v)
 	}
-	s.client.Bulk().Index(s.name).Request(save).Do(ctx)
+	//save = data
+	_, err = s.client.Bulk().Index(s.name).Request(&save).Do(ctx)
 	return
 }
 
