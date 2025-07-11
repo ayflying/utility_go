@@ -124,11 +124,11 @@ var (
 					FileUrl: url[v.S3],
 				})
 				if err != nil {
+					Proxy := g.Cfg().MustGet(ctx, "update_proxy", "http://192.168.50.170:10808").String()
 					g.Log().Debugf(ctx, "切换代理进行上传:err=%v", err)
-					get, err = client.Proxy("http://192.168.50.114:10808").
-						Post(ctx, address+"/callback/update", &UpdateReq{
-							FileUrl: url[v.S3],
-						})
+					get, err = client.Proxy(Proxy).Post(ctx, address+"/callback/update", &UpdateReq{
+						FileUrl: url[v.S3],
+					})
 				}
 				if err != nil {
 					g.Log().Error(ctx, err)
