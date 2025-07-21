@@ -134,7 +134,8 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 	//循环获取缓存数据
 	err = tools.Redis.RedisScanV2(cacheKey, func(keys []string) (err error) {
-		var add []interface{}
+		var add = make([]*entity.GameAct, 0)
+		var update = make([]*entity.GameAct, 0)
 		var delKey []string
 		for _, cacheKey = range keys {
 			result := strings.Split(cacheKey, ":")
@@ -176,25 +177,51 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			}
 			actionData := cacheGet.String()
 			if data == nil {
-				//data =
-				add = append(add, &do.GameAct{
+				add = append(add, &entity.GameAct{
 					ActId:  actId,
 					Uid:    uid,
 					Action: actionData,
 				})
 			} else {
 				//覆盖数据
+				data.ActId = actId
+				data.Uid = uid
 				data.Action = actionData
-				add = append(add, data)
+				update = append(update, data)
 			}
 			//最后删除key
 			delKey = append(delKey, cacheKey)
 		}
 
 		//批量写入数据库
-		if len(add) > 0 {
-			dbRes, err2 := g.Model(Name).Batch(30).Data(add).Save()
-			add = make([]interface{}, 0)
+		if len(delKey) > 0 {
+			for _, v := range update {
+				v.UpdatedAt = gtime.Now()
+				_, err2 := g.Model(Name).Where(do.GameAct{
+					Uid:       v.Uid,
+					ActId:     v.ActId,
+					UpdatedAt: v.UpdatedAt,
+				}).Data(v).Update()
+				if err2 != nil {
+					g.Log().Error(ctx, err2)
+					return
+				}
+				////获取多少个数据，删除不是当前修改的数据
+				//count, _ := g.Model(Name).Where(do.GameAct{
+				//	Uid:   v.Uid,
+				//	ActId: v.ActId,
+				//}).Count()
+				//if count > 1 {
+				//	g.Model(Name).Where(do.GameAct{
+				//		Uid:   v.Uid,
+				//		ActId: v.ActId,
+				//	}).WhereNot("updated_at", v.UpdatedAt).Delete()
+				//}
+			}
+			//dbRes, err2 := g.Model(Name).Batch(50).Data(add).Update()
+			update = make([]*entity.GameAct, 0)
+			dbRes, err2 := g.Model(Name).Batch(50).Data(add).Save()
+			add = make([]*entity.GameAct, 0)
 			if err2 != nil {
 				g.Log().Error(ctx, err2)
 				return
