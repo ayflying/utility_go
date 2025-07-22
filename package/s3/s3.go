@@ -270,7 +270,7 @@ func (s *Mod) GetPath(url string) (filePath string) {
 	return url[len(get+bucketName)+1:]
 }
 
-// 复制文件
+// CopyObject 复制文件
 func (s *Mod) CopyObject(bucketName string, dstStr string, srcStr string) (err error) {
 
 	// 原始文件
@@ -286,5 +286,17 @@ func (s *Mod) CopyObject(bucketName string, dstStr string, srcStr string) (err e
 	}
 
 	_, err = s.client.CopyObject(ctx, dst, src)
+	return
+}
+
+// Rename 重命名文件
+func (s *Mod) Rename(bucketName string, name string, newName string) (err error) {
+	// 复制文件到新的名称
+	err = s.CopyObject(bucketName, name, newName)
+	if err != nil {
+		return
+	}
+	// 删除原始文件
+	err = s.RemoveObject(bucketName, name)
 	return
 }

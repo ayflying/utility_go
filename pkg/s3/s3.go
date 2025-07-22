@@ -150,7 +150,20 @@ func (s *Mod) PutObject(f io.Reader, name string, bucketName string, _size ...in
 }
 
 // RemoveObject 从指定存储桶中删除指定名称的文件
+// Deprecation: to新方法 RemoveObjectV2
 func (s *Mod) RemoveObject(name string, bucketName string) (err error) {
+	opts := minio.RemoveObjectOptions{
+		ForceDelete: true,
+		//GovernanceBypass: true,
+		//VersionID:        "myversionid",
+	}
+	// 调用 S3 客户端删除文件
+	err = s.client.RemoveObject(ctx, bucketName, name, opts)
+	return
+}
+
+// RemoveObjectV2 从指定存储桶中删除指定名称的文件
+func (s *Mod) RemoveObjectV2(bucketName string, name string) (err error) {
 	opts := minio.RemoveObjectOptions{
 		ForceDelete: true,
 		//GovernanceBypass: true,
@@ -216,21 +229,43 @@ func (s *Mod) GetPath(url string) (filePath string) {
 }
 
 // CopyObject 在指定存储桶内复制文件
-// 支持指定源文件和目标文件路径
+// bucketName 存储桶名称
+// dstStr 目标文件路径
+// srcStr 源文件路径
+// 返回操作过程中可能出现的错误
 func (s *Mod) CopyObject(bucketName string, dstStr string, srcStr string) (err error) {
-	// 定义目标文件选项
+	// 定义目标文件的复制选项，包含存储桶名称和目标文件路径
 	var dst = minio.CopyDestOptions{
 		Bucket: bucketName,
 		Object: dstStr,
 	}
 
-	// 定义源文件选项
+	// 定义源文件的复制选项，包含存储桶名称和源文件路径
 	var src = minio.CopySrcOptions{
 		Bucket: bucketName,
 		Object: srcStr,
 	}
 
-	// 调用 S3 客户端复制文件
+	// 调用 S3 客户端的 CopyObject 方法，将源文件复制到目标位置
+	// 忽略返回的复制信息，仅关注是否发生错误
 	_, err = s.client.CopyObject(ctx, dst, src)
+	return
+}
+
+// Rename 重命名文件
+func (s *Mod) Rename(bucketName string, oldName string, newName string) (err error) {
+	// 复制文件到新的名称
+	g.Log().Debugf(nil, "仓库=%v,rename %s to %s", bucketName, oldName, newName)
+	err = s.CopyObject(bucketName, newName, oldName)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return
+	}
+	// 删除原始文件
+	err = s.RemoveObjectV2(bucketName, oldName)
+	if err != nil {
+		g.Log().Error(ctx, err)
+		return
+	}
 	return
 }
