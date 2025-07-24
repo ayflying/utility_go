@@ -1,15 +1,15 @@
 package vivo
 
 type Pay struct {
-	AppId     string
-	AppKey    string
-	AppSecret string
+	AppId  string
+	AppKey string
+	//AppSecret string
 }
 
-func New(appId, appKey, appSecret string) (client *Pay) {
+func New(cfg *Pay) (client *Pay) {
 	return &Pay{
-		AppId:     appId,
-		AppKey:    appKey,
-		AppSecret: appSecret,
+		AppId:  cfg.AppId,
+		AppKey: cfg.AppKey,
+		//AppSecret: cfg.AppSecret,
 	}
 }

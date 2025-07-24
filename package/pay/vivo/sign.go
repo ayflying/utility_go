@@ -14,7 +14,8 @@ func (p *Pay) VerifySign(bm g.Map, key string) bool {
 	signature := bm["signature"]
 	delete(bm, "signature")
 	delete(bm, "signMethod")
-	return signature == p.sign(bm, key)
+	sign := p.sign(bm, key)
+	return signature == sign
 }
 
 func (p *Pay) sign(bm g.Map, key string) string {

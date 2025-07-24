@@ -41,7 +41,7 @@ func TestVerifySign(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New("123", "123", "123").VerifySign(tt.args.bm, tt.args.key); got != tt.want {
+			if got := New(nil).VerifySign(tt.args.bm, tt.args.key); got != tt.want {
 				t.Errorf("VerifySign() = %v, want %v", got, tt.want)
 			}
 		})

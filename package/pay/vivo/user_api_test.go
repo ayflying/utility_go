@@ -30,7 +30,7 @@ func TestAuthToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRsp, err := New("", "", "").AuthToken(tt.args.bm)
+			gotRsp, err := New(nil).AuthToken(tt.args.bm)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("AuthToken() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -62,7 +62,7 @@ func TestFormatURLParam(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotUrlParam := New("", "", "").FormatURLParam(tt.args.body); gotUrlParam != tt.wantUrlParam {
+			if gotUrlParam := New(nil).FormatURLParam(tt.args.body); gotUrlParam != tt.wantUrlParam {
 				t.Errorf("FormatURLParam() = %v, want %v", gotUrlParam, tt.wantUrlParam)
 			}
 		})

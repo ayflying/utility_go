@@ -47,7 +47,7 @@ func (p *OppoType) FileIdInfo(ctx context.Context, oauthToken string, ssoid stri
 	})
 	getRes := getHtml.ReadAllString()
 	gjson.DecodeTo(getRes, &res)
-	g.Log().Debugf(ctx, "当前登陆请求的：%v", res)
+	//g.Log().Debugf(ctx, "当前登陆请求的：%v", res)
 	return
 
 }
