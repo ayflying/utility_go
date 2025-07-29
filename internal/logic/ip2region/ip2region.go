@@ -40,7 +40,7 @@ func (s *sIp2region) Load() {
 	var err error
 
 	var dbPath = "runtime/library/ip2region.xdb"
-	var url = "https://github.com/ayflying/resource/raw/refs/heads/main/attachment/ip2region.xdb"
+	var url = "https://github.com/ayflying/resource/raw/refs/heads/master/attachment/ip2region.xdb"
 	if wait {
 		return
 	}
