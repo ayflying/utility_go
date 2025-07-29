@@ -3,7 +3,6 @@ package oppo
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/haxqer/xthird/oppo"
 )
 
 // 跟充值平台通信的加密key
@@ -30,12 +29,12 @@ func (p *OppoType) Verify(ctx context.Context) (err error) {
 	oppoPublicKey := "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCmreYIkPwVovKR8rLHWlFVw7YDfm9uQOJKL89Smt6ypXGVdrAKKl0wNYc3/jecAoPi2ylChfa2iRu5gunJyNmpWZzlCNRIau55fxGW0XEu553IiprOZcaw5OuYGlf60ga8QT6qToP0/dpiL/ZbmNUO9kUhosIjEu22uFgR+5cYyQIDAQAB"
 	//oppoPublicKey := p.PublicKey
 	// 解析请求参数
-	bodyMap, err := oppo.ParseNotifyToBodyMap(g.RequestFromCtx(ctx).Request)
+	bodyMap, err := p.ParseNotifyToBodyMap(g.RequestFromCtx(ctx).Request)
 	if err != nil {
 		// 解析失败, 处理错误逻辑
 		return
 	}
 
-	err = oppo.VerifySign(oppoPublicKey, bodyMap)
+	err = p.VerifySign(oppoPublicKey, bodyMap)
 	return
 }

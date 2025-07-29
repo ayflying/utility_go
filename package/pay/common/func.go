@@ -1,4 +1,4 @@
-package pay
+package common
 
 import "strings"
 
