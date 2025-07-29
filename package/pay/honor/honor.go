@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"encoding/pem"
 	"errors"
+	"github.com/ayflying/utility_go/package/pay"
 )
 
 type Pay struct {
@@ -15,8 +16,11 @@ type Pay struct {
 	AppId  string `json:"appId"`
 }
 
-func New() *Pay {
-	return &Pay{}
+func New(pay *Pay) *Pay {
+	return &Pay{
+		AppId:  pay.AppId,
+		PubKey: pay.PubKey,
+	}
 }
 
 // VerifyRSASignature 验证RSA数字签名
@@ -31,8 +35,9 @@ func (p *Pay) VerifyRSASignature(data []byte, sign string) (bool, error) {
 		return false, errors.New("签名解码失败: " + err.Error())
 	}
 
+	pubkey := pay.FormatPublicKey(p.PubKey)
 	// 解析PEM格式的公钥
-	block, _ := pem.Decode([]byte(p.PubKey))
+	block, _ := pem.Decode([]byte(pubkey))
 	if block == nil {
 		return false, errors.New("无效的PEM格式公钥")
 	}
