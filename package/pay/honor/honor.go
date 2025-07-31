@@ -1,6 +1,7 @@
 package honor
 
 import (
+	"context"
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -28,7 +29,11 @@ func New(pay *Pay) *Pay {
 // sign: 签名的Base64编码字符串
 // pubKey: PEM格式的公钥字符串
 // 返回验证结果和可能的错误
-func (p *Pay) VerifyRSASignature(data []byte, sign string) (bool, error) {
+func (p *Pay) VerifyRSASignature(ctx context.Context, data []byte, sign string) (bool, error) {
+	//req := g.RequestFromCtx(ctx).Request
+	//post, err := common.ParseNotifyToBodyMap(req)
+	//var data = gjson.MustEncode(post)
+
 	// 解码Base64格式的签名
 	signBytes, err := base64.StdEncoding.DecodeString(sign)
 	if err != nil {

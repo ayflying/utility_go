@@ -15,6 +15,8 @@ var (
 	wait = false
 )
 
+const IpDbPath = "runtime/library/ip2region.xdb"
+
 type sIp2region struct {
 	searcher *xdb.Searcher
 }
@@ -35,16 +37,17 @@ func init() {
 // Load 加载到内存中
 //
 //	@Description: 加载ip2region数据库到内存中。
+
 //	@receiver s *sIp2region: sIp2region的实例。
 func (s *sIp2region) Load() {
 	var err error
 
-	var dbPath = "runtime/library/ip2region.xdb"
+	//var dbPath = "runtime/library/ip2region.xdb"
 	var url = "https://github.com/ayflying/resource/raw/refs/heads/master/attachment/ip2region.xdb"
 	if wait {
 		return
 	}
-	if gfile.IsEmpty(dbPath) {
+	if gfile.IsEmpty(IpDbPath) {
 		wait = true
 		defer func() {
 			wait = false
@@ -55,9 +58,9 @@ func (s *sIp2region) Load() {
 		if err2 != nil {
 			return
 		}
-		err = gfile.PutBytes(dbPath, putData.ReadAll())
+		err = gfile.PutBytes(IpDbPath, putData.ReadAll())
 	}
-	cBuff := gfile.GetBytes(dbPath)
+	cBuff := gfile.GetBytes(IpDbPath)
 	/*
 		var cBuff []byte
 		if gres.Contains(dbPath) {
@@ -78,7 +81,9 @@ func (s *sIp2region) Load() {
 
 func (s *sIp2region) GetIp(ip string) (res []string) {
 	//初始化加载
-	s.Load()
+	if s.searcher != nil {
+		s.Load()
+	}
 
 	res = make([]string, 5)
 	if s.searcher == nil {

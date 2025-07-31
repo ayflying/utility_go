@@ -13,7 +13,8 @@ var (
 )
 
 func Boot() (err error) {
-	err = service.SystemCron().StartCron()
+	// 启动计划任务定时器，预防debug工具激活计划任务造成重复执行，此处不执行计划任务
+	//err = service.SystemCron().StartCron()
 
 	//用户活动持久化
 	service.SystemCron().AddCronV2(v1.CronType_DAILY, func(ctx context.Context) error {
