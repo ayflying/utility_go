@@ -1,7 +1,9 @@
 package vivo
 
 import (
+	"context"
 	"errors"
+	"github.com/ayflying/utility_go/package/pay/common"
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -10,7 +12,8 @@ import (
 	"strings"
 )
 
-func (p *Pay) VerifySign(bm g.Map, key string) bool {
+func (p *Pay) VerifySign(ctx context.Context, key string) bool {
+	bm, _ := common.ParseNotifyToBodyMap(g.RequestFromCtx(ctx).Request)
 	signature := bm["signature"]
 	delete(bm, "signature")
 	delete(bm, "signMethod")
