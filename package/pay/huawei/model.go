@@ -47,3 +47,36 @@ type StatusUpdateNotification struct {
 type AtResponse struct {
 	AccessToken string `json:"access_token"`
 }
+
+type VerifyTokenRes struct {
+	ResponseCode       string `json:"responseCode"`
+	PurchaseTokenData  string `json:"purchaseTokenData"`
+	DataSignature      string `json:"dataSignature"`
+	SignatureAlgorithm string `json:"signatureAlgorithm"`
+}
+
+type PurchaseTokenData struct {
+	AutoRenewing        bool   `json:"autoRenewing" dc:"表示订阅是否自动续费"`
+	OrderId             string `json:"orderId" dc:"订单ID，唯一标识一笔订单"`
+	PackageName         string `json:"packageName" dc:"应用的包名"`
+	ApplicationId       int    `json:"applicationId" dc:"应用ID，以整数形式表示"`
+	ApplicationIdString string `json:"applicationIdString" dc:"应用ID的字符串形式"`
+	Kind                int    `json:"kind" dc:"购买类型的某种标识，具体含义可能取决于业务逻辑"`
+	ProductId           string `json:"productId" dc:"商品ID，用于标识购买的商品"`
+	ProductName         string `json:"productName" dc:"商品名称"`
+	PurchaseTime        int64  `json:"purchaseTime" dc:"购买时间，可能是某种特定格式的时间表示"`
+	PurchaseTimeMillis  int64  `json:"purchaseTimeMillis" dc:"购买时间，以毫秒为单位的时间戳"`
+	PurchaseState       int    `json:"purchaseState" dc:"购买状态，不同的整数值代表不同的状态，具体含义取决于业务逻辑"`
+	DeveloperPayload    string `json:"developerPayload" dc:"开发者自定义负载数据"`
+	PurchaseToken       string `json:"purchaseToken" dc:"购买令牌"`
+	ResponseCode        string `json:"responseCode" dc:"响应代码，用于表示购买操作的响应结果"`
+	ConsumptionState    int    `json:"consumptionState" dc:"消费状态，不同的整数值代表不同的消费状态，具体含义取决于业务逻辑"`
+	Confirmed           int    `json:"confirmed" dc:"确认状态，不同的整数值代表不同的确认情况，具体含义取决于业务逻辑"`
+	PurchaseType        int    `json:"purchaseType" dc:"购买类型，不同的整数值代表不同的购买类型，具体含义取决于业务逻辑"`
+	Currency            string `json:"currency" dc:"货币类型"`
+	Price               int    `json:"price" dc:"商品价格"`
+	Country             string `json:"country" dc:"购买所在国家"`
+	PayOrderId          string `json:"payOrderId" dc:"支付订单ID"`
+	PayType             string `json:"payType" dc:"支付类型"`
+	SdkChannel          string `json:"sdkChannel" dc:"SDK渠道"`
+}

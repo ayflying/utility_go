@@ -10,6 +10,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"io"
 	"log"
 	"net/http"
@@ -17,9 +20,9 @@ import (
 )
 
 type Pay struct {
-	ClientSecret         string `json:"client_secret"`
-	ClientId             string `json:"client_id"`
-	TokenUrl             string `json:"token_url"`
+	ClientSecret string `json:"client_secret"`
+	ClientId     string `json:"client_id"`
+	//TokenUrl             string `json:"token_url"`
 	ApplicationPublicKey string `json:"application_public_key"`
 }
 
@@ -46,21 +49,24 @@ func (p *Pay) ConfirmPurchase(purchaseToken, productId string, accountFlag int) 
 		log.Printf("err is %s", err)
 	}
 	// 打印响应结果（实际业务中需替换为具体处理逻辑，如更新订单状态、校验响应数据等）
-	// TODO:  建议根据华为支付文档解析响应数据（如检查code是否为0表示成功）
+	// TODO:  建议根据华为支付文档解析响应数据（如检查responseCode是否为0表示成功）
 	log.Printf("%s", bodyBytes)
 }
 
 // VerifyToken 验证回调订单
 //您可以调用本接口向华为应用内支付服务器校验支付结果中的购买令牌，确认支付结果的准确性。
-func (p *Pay) VerifyToken(purchaseToken, productId string, accountFlag int) {
+func (p *Pay) VerifyToken(purchaseToken, productId string, accountFlag int) (res *PurchaseTokenData, err error) {
 	bodyMap := map[string]string{"purchaseToken": purchaseToken, "productId": productId}
 	url := getOrderUrl(accountFlag) + "/applications/purchases/tokens/verify"
 	bodyBytes, err := p.SendRequest(url, bodyMap)
 	if err != nil {
-		log.Printf("err is %s", err)
+		g.Log().Error(gctx.New(), "err is %s", err)
 	}
-	// TODO: display the response as string in console, you can replace it with your business logic.
-	log.Printf("%s", bodyBytes)
+	var data *VerifyTokenRes
+	err = gjson.DecodeTo(bodyBytes, &data)
+	err = gjson.DecodeTo(data.PurchaseTokenData, &res)
+
+	return
 }
 
 func (p *Pay) SendRequest(url string, bodyMap map[string]string) (string, error) {
@@ -97,6 +103,7 @@ func (p *Pay) SendRequest(url string, bodyMap map[string]string) (string, error)
 }
 
 func (p *Pay) VerifyRsaSign(content string, sign string, publicKey string) error {
+	//publicKey = common.FormatPublicKey(publicKey)
 	publicKeyByte, err := base64.StdEncoding.DecodeString(publicKey)
 	if err != nil {
 		return err
@@ -120,7 +127,7 @@ func (p *Pay) GetAppAt() (string, error) {
 		"client_secret": {p.ClientSecret},
 		"client_id":     {p.ClientId},
 	}
-	resp, err := RequestHttpClient.PostForm(p.TokenUrl, urlValue)
+	resp, err := RequestHttpClient.PostForm(TokenUrl, urlValue)
 	defer resp.Body.Close()
 	bodyBytes, err := io.ReadAll(resp.Body)
 
