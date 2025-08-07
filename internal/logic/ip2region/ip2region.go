@@ -1,13 +1,14 @@
 package ip2region
 
 import (
+	"net"
+	"strings"
+
 	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
-	"net"
-	"strings"
 )
 
 var (
@@ -81,7 +82,7 @@ func (s *sIp2region) Load() {
 
 func (s *sIp2region) GetIp(ip string) (res []string) {
 	//初始化加载
-	if s.searcher != nil {
+	if s.searcher == nil {
 		s.Load()
 	}
 
