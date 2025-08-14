@@ -3,6 +3,10 @@ package gameAct
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/ayflying/utility_go/internal/model/do"
 	"github.com/ayflying/utility_go/internal/model/entity"
 	"github.com/ayflying/utility_go/pkg"
@@ -13,9 +17,6 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
-	"strconv"
-	"strings"
-	"time"
 )
 
 var (
@@ -206,37 +207,30 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					g.Log().Error(ctx, err2)
 					return
 				}
-				////获取多少个数据，删除不是当前修改的数据
-				//count, _ := g.Model(Name).Where(do.GameAct{
-				//	Uid:   v.Uid,
-				//	ActId: v.ActId,
-				//}).Count()
-				//if count > 1 {
-				//	g.Model(Name).Where(do.GameAct{
-				//		Uid:   v.Uid,
-				//		ActId: v.ActId,
-				//	}).WhereNot("updated_at", v.UpdatedAt).Delete()
-				//}
 			}
-			//dbRes, err2 := g.Model(Name).Batch(50).Data(add).Update()
 			update = make([]*entity.GameAct, 0)
-			dbRes, err2 := g.Model(Name).Batch(50).Data(add).Save()
-			add = make([]*entity.GameAct, 0)
-			if err2 != nil {
-				g.Log().Error(ctx, err2)
-				return
+			var count int64
+
+			if len(add) > 0 {
+				dbRes, err2 := g.Model(Name).Batch(50).Data(add).Save()
+				add = make([]*entity.GameAct, 0)
+				err = err2
+				if err != nil {
+					g.Log().Error(ctx, err2)
+					return
+				}
+				count, _ = dbRes.RowsAffected()
 			}
 
 			for _, v := range delKey {
-				_, err2 = g.Redis().Del(ctx, v)
-				if err2 != nil {
-					g.Log().Error(ctx, err2)
+				_, err = g.Redis().Del(ctx, v)
+				if err != nil {
+					g.Log().Error(ctx, err)
 					return
 				}
 			}
 			delKey = make([]string, 0)
 
-			count, _ := dbRes.RowsAffected()
 			g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
 		}
 
