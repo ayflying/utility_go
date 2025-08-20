@@ -2,16 +2,17 @@ package gameKv
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/ayflying/utility_go/pkg"
 	"github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 var (
@@ -107,8 +108,7 @@ func (s *sGameKv) SavesV1() (err error) {
 			for _, v := range delKey {
 				_, err2 = g.Redis().Del(ctx, v)
 				if err2 != nil {
-					g.Log().Errorf(ctx, "删除存档错误：%v,err=%v", v, err2)
-					return
+					g.Log().Errorf(ctx, "删除存档失败：%v,err=%v", v, err2)
 				}
 			}
 

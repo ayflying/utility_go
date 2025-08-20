@@ -226,7 +226,6 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				_, err = g.Redis().Del(ctx, v)
 				if err != nil {
 					g.Log().Error(ctx, err)
-					return
 				}
 			}
 			delKey = make([]string, 0)
