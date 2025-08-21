@@ -59,8 +59,33 @@ var (
 	gamelogClient *gclient.Client
 
 	// location map
-	locationMap map[string]*time.Location = map[string]*time.Location{}
+	// locationMap map[string]*time.Location = map[string]*time.Location{}
+	locationMap sync.Map // 声明一个线程安全的Map
+
 )
+
+func getLocationMapValue(key string) *time.Location {
+	// 1. 先尝试读
+	value, loaded := locationMap.Load(key)
+	if loaded {
+		return value.(*time.Location) // 如果已经存在，直接返回
+	}
+	// 2. 不存在，就初始化一个该key对应的**固定的**新值
+	location, err := time.LoadLocation(key)
+	if err != nil {
+		g.Log().Warningf(ctx, "[GameLog]load location error, try use local timezone: %v", err)
+		return nil
+	}
+	// 3. 核心：原子性地存储，如果key已存在则返回已存在的值
+	actualValue, loaded := locationMap.LoadOrStore(key, location)
+	if loaded {
+		// 如果loaded为true，说明其他goroutine抢先存了
+		// 我们可以丢弃刚创建的newValue（如果有需要的话），返回已存在的actualValue
+		return actualValue.(*time.Location)
+	}
+	// 如果loaded为false，说明是我们存成功的，返回我们刚创建的newValue
+	return actualValue.(*time.Location)
+}
 
 func (sdk *SDK) varinit() error {
 	sdk.sdkConfig = &SDKConfig{}
@@ -245,14 +270,8 @@ const datetimeFmt = time.DateOnly + " " + time.TimeOnly
 // 记录日志
 func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string) {
 	loc := time.Local
-	if _, ok := locationMap[timezone]; !ok {
-		location, err := time.LoadLocation(timezone)
-		if err != nil {
-			g.Log().Warningf(ctx, "[GameLog]load location error, try use local timezone: %v", err)
-		} else {
-			locationMap[timezone] = location
-			loc = location
-		}
+	if _loc := getLocationMapValue(timezone); _loc != nil {
+		loc = _loc
 	}
 	log := GameLog{
 		Uid:          uid,
