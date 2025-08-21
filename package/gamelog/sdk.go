@@ -39,6 +39,7 @@ type SDKConfig struct {
 	FlushInterval int    // 刷新间隔
 	DiskBakPath   string // 磁盘备份路径
 	RetryN        int    // 每N次重试
+	ChanSize      int    // 信道大小, 默认1000
 
 	reportN int
 }
@@ -100,6 +101,12 @@ func (sdk *SDK) varinit() error {
 	}
 	sdk.sdkConfig.RetryN = _retryN.Int()
 
+	_chanSize, err := g.Config().Get(ctx, "angergs.bisdk.chanSize")
+	if err != nil {
+		return err
+	}
+	sdk.sdkConfig.ChanSize = _chanSize.Int()
+
 	g.Log().Infof(ctx, "[GameLog]client init success, config: %v", sdk.sdkConfig)
 	return nil
 }
@@ -123,6 +130,9 @@ func (sdk *SDK) checkConfig() error {
 	}
 	if config.RetryN == 0 {
 		config.RetryN = 10
+	}
+	if config.ChanSize == 0 {
+		config.ChanSize = 1000
 	}
 	config.DiskBakPath = strings.TrimSuffix(config.DiskBakPath, "/")
 
@@ -148,7 +158,9 @@ func INIT(config *SDKConfig) (*SDK, error) {
 	sdk.buffer = make([]GameLog, 0, 100)
 	// 加载失败日志
 	failLogs, err := sdk.loadFailLogs4disk()
-	if err != nil && len(failLogs) > 0 {
+	if err != nil {
+		g.Log().Errorf(ctx, "[GameLog]load fail logs error: %v", err)
+	} else if len(failLogs) > 0 {
 		sdk.buffer = append(sdk.buffer, failLogs...)
 	}
 
@@ -212,7 +224,11 @@ func (sdk *SDK) loadFailLogs4disk() (logs []GameLog, err error) {
 // 备份失败日志追加到磁盘
 func (sdk *SDK) bakFailLogs2disk(failLogs []GameLog) {
 	bakPath := fmt.Sprintf("%s/failBuffer%s.bak.log", sdk.sdkConfig.DiskBakPath, gtime.Now().Format("YmdH"))
-	content, _ := json.Marshal(failLogs)
+	content, err := json.Marshal(failLogs)
+	if err != nil {
+		g.Log().Errorf(ctx, "[GameLog]marshal fail logs error: %v", err)
+		return
+	}
 	gfile.PutContentsAppend(bakPath, string(content)+"\n")
 	g.Log().Infof(ctx, "[GameLog]backup fail buffer to %s", bakPath)
 }
@@ -288,7 +304,11 @@ func (sdk *SDK) send(logs []GameLog) {
 	data := make([][]any, 0, len(logs))
 	// logs 拆分成二维数组
 	for _, log := range logs {
-		propertyJson, _ := json.Marshal(log.Property)
+		propertyJson, err := json.Marshal(log.Property)
+		if err != nil {
+			g.Log().Errorf(ctx, "[GameLog]skip log parse, marshal property error: %v", err)
+			continue
+		}
 		data = append(data, []any{
 			log.Uid,
 			log.Event,
@@ -302,7 +322,11 @@ func (sdk *SDK) send(logs []GameLog) {
 		Pid:  sdk.sdkConfig.Pid,
 		Data: data,
 	}
-	jsonBody, _ := json.Marshal(sbody)
+	jsonBody, err := json.Marshal(sbody)
+	if err != nil {
+		g.Log().Errorf(ctx, "[GameLog]marshal send body error: %v", err)
+		return
+	}
 
 	// giz压缩
 	gzBody := bytes.NewBuffer([]byte{})
@@ -315,18 +339,18 @@ func (sdk *SDK) send(logs []GameLog) {
 
 	sdk.sdkConfig.reportN += 1
 	res, err := gamelogClient.Post(timeoutCtx, sdk.sdkConfig.BaseUrl+"/report/event", xorBody)
-	defer func() {
-		cerr := res.Close()
-		if cerr != nil {
-			g.Log().Errorf(ctx, "[GameLog]close response error: %v", cerr)
-		}
-	}()
 	// 失败重新加入缓冲区
 	if err != nil {
 		sdk.bakFailLogs2disk(logs)
 		g.Log().Warningf(ctx, "[GameLog]send log error, bak to fail buffer(%d): %v", len(logs), err)
 		return
 	}
+	defer func() {
+		cerr := res.Close()
+		if cerr != nil {
+			g.Log().Errorf(ctx, "[GameLog]close response error: %v", cerr)
+		}
+	}()
 	httpcode := res.StatusCode
 	resBody := res.ReadAllString()
 	// 收集器拦截, 重新加入缓冲区

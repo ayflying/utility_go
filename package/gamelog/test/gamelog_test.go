@@ -21,7 +21,8 @@ func TestGamelog(t *testing.T) {
 		FlushInterval: 5,            // 上报间隔
 		DiskBakPath:   "gamelog",    // 本地磁盘备份, 用于意外情况下临时保存日志, 请确保该目录持久化(容器内要挂载). 每次启动时或每N次上报时加载到失败队列
 		// 可填
-		RetryN: 2, // 默认每10次上传检查一次磁盘的失败数据
+		RetryN:   2,   // 默认每10次, 上传检查一次磁盘的失败数据
+		ChanSize: 500, // 默认1000, 信道size
 	})
 
 	// 随机测试事件和属性
