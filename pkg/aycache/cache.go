@@ -1,6 +1,8 @@
 package aycache
 
 import (
+	"math"
+
 	v1 "github.com/ayflying/utility_go/api/system/v1"
 	"github.com/ayflying/utility_go/internal/boot"
 	"github.com/ayflying/utility_go/pkg/aycache/drive"
@@ -9,7 +11,6 @@ import (
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"math"
 )
 
 // Mod 定义缓存模块结构体，包含一个 gcache.Cache 客户端实例
@@ -19,6 +20,7 @@ type Mod struct {
 
 // QPSCount 记录缓存的 QPS 计数
 var QPSCount int
+
 // QPS 是一个 Prometheus 指标，用于记录当前缓存的 QPS 数量
 var QPS = promauto.NewGauge(
 	prometheus.GaugeOpts{
@@ -53,8 +55,13 @@ func New(_name ...string) gcache.Adapter {
 		// 创建内存缓存适配器
 		cacheAdapterObj = drive2.NewAdapterMemory()
 	case "redis":
+		//第二个参数为配置名称，默认为default
+		var typ = "default"
+		if len(_name) >= 2 {
+			typ = _name[1]
+		}
 		// 创建 Redis 缓存适配器
-		cacheAdapterObj = drive2.NewAdapterRedis()
+		cacheAdapterObj = drive2.NewAdapterRedis(typ)
 	case "file":
 		// 创建文件缓存适配器，指定缓存目录为 "runtime/cache"
 		cacheAdapterObj = drive2.NewAdapterFile("runtime/cache")

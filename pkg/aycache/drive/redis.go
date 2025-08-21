@@ -7,19 +7,22 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 )
 
-var adapterRedisClient gcache.Adapter
-var adapterRedisCache = gcache.New()
+var adapterRedisClient = make(map[string]gcache.Adapter)
+var adapterRedisCache = make(map[string]*gcache.Cache)
 
-func NewAdapterRedis() gcache.Adapter {
-
-	if adapterRedisClient == nil {
-		_cfg, _ := g.Cfg().Get(gctx.New(), "redis.default")
+func NewAdapterRedis(name string) gcache.Adapter {
+	if adapterRedisClient[name] == nil {
+		_cfg, err := g.Cfg().Get(gctx.New(), "redis."+name)
+		if err != nil {
+			panic("当前redis配置不存在")
+		}
 		var cfg *gredis.Config
 		_cfg.Scan(&cfg)
 		redisObj, _ := gredis.New(cfg)
-		//adapterRedisClient = gcache.NewAdapterRedis(g.Redis("default"))
-		adapterRedisClient = gcache.NewAdapterRedis(redisObj)
-		adapterRedisCache.SetAdapter(adapterRedisClient)
+		//adapterRedisClient[name] = gcache.NewAdapterRedis(g.Redis(name))
+		adapterRedisClient[name] = gcache.NewAdapterRedis(redisObj)
+		adapterRedisCache[name] = gcache.New()
+		adapterRedisCache[name].SetAdapter(adapterRedisClient[name])
 	}
-	return adapterRedisCache
+	return adapterRedisCache[name]
 }
