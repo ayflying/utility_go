@@ -38,7 +38,8 @@ type (
 		// @receiver s: sSystemCron的实例，代表一个调度系统。
 		// @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
 		// @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
-		AddCronV2(typ v1.CronType, _func func(context.Context) error)
+		// @param unique: 是否只在唯一服务器上执行
+		AddCronV2(typ v1.CronType, _func func(context.Context) error, unique ...bool)
 		// StartCron 开始计划任务执行
 		//
 		//	@Description:

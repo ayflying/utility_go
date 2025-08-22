@@ -2,6 +2,9 @@ package systemCron
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/ayflying/utility_go/api/system/v1"
 	"github.com/ayflying/utility_go/service"
 	"github.com/gogf/gf/v2/frame/g"
@@ -9,8 +12,6 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/os/gtimer"
-	"sync"
-	"time"
 )
 
 var (
@@ -89,7 +90,13 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 // @receiver s: sSystemCron的实例，代表一个调度系统。
 // @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
 // @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
-func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error) {
+// @param unique: 是否只在唯一服务器上执行
+func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error, unique ...bool) {
+	//如果
+	if g.Cfg().MustGet(gctx.New(), "game.cron_close").Bool() {
+		return
+	}
+
 	//加锁
 	s.Lock.Lock()
 	defer s.Lock.Unlock()

@@ -1,6 +1,7 @@
 package aycache
 
 import (
+	"context"
 	"math"
 
 	v1 "github.com/ayflying/utility_go/api/system/v1"
@@ -33,7 +34,7 @@ var QPS = promauto.NewGauge(
 func init() {
 	boot.AddFunc(func() {
 		// 初始化指标，每分钟计算一次平均 QPS 并重置计数器
-		service.SystemCron().AddCron(v1.CronType_MINUTE, func() error {
+		service.SystemCron().AddCronV2(v1.CronType_MINUTE, func(context.Context) error {
 			QPS.Set(math.Round(float64(QPSCount) / 60))
 			QPSCount = 0
 			return nil

@@ -7,9 +7,6 @@ package service
 
 type (
 	IIp2Region interface {
-		// Load 加载到内存中
-		//
-		//	@Description: 加载ip2region数据库到内存中。
 		//	@receiver s *sIp2region: sIp2region的实例。
 		Load()
 		GetIp(ip string) (res []string)
