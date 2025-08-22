@@ -20,9 +20,10 @@ import (
 )
 
 var (
-	ctx     = gctx.New()
-	Name    = "game_act"
-	ActList = gset.New(true)
+	ctx        = gctx.New()
+	Name       = "game_act"
+	ActList    = gset.New(true)
+	RunTimeMax *gtime.Time
 )
 
 type sGameAct struct {
@@ -115,10 +116,15 @@ func (s *sGameAct) Saves(ctx context.Context) (err error) {
 	} else {
 		pkg.Cache("redis").Set(nil, "cron:game_act", gtime.Now().Unix(), time.Hour)
 	}
-
+	// 最大允许执行时间
+	RunTimeMax = gtime.Now().Add(time.Minute * 30)
 	//遍历执行
 	ActList.Iterator(func(i interface{}) bool {
-		err = s.Save(ctx, i.(int))
+		//在时间内允许执行
+		if gtime.Now().Before(RunTimeMax) {
+			g.Log().Errorf(ctx, "开始执行游戏act数据保存: act%v", i)
+			err = s.Save(ctx, i.(int))
+		}
 		return true
 	})
 	return
@@ -135,6 +141,11 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 	//循环获取缓存数据
 	err = tools.Redis.RedisScanV2(cacheKey, func(keys []string) (err error) {
+		//判断是否超时
+		if gtime.Now().After(RunTimeMax) {
+			g.Log().Debug(ctx, "执行超时了,停止执行！")
+			return
+		}
 		var add = make([]*entity.GameAct, 0)
 		var update = make([]*entity.GameAct, 0)
 		var delKey []string

@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	ctx  = gctx.New()
-	Name = "game_kv"
+	ctx        = gctx.New()
+	Name       = "game_kv"
+	RunTimeMax *gtime.Time
 )
 
 type sGameKv struct {
@@ -38,6 +39,10 @@ func init() {
 // @receiver s: sGameKv的实例。
 // @return err: 错误信息，如果操作成功，则为nil。
 func (s *sGameKv) SavesV1() (err error) {
+	// 最大允许执行时间
+	RunTimeMax = gtime.Now().Add(time.Minute * 30)
+	g.Log().Debug(ctx, "开始执行游戏kv数据保存")
+
 	getCache, err := pkg.Cache("redis").Get(nil, "cron:game_kv")
 	//如果没有执行过，设置时间戳
 	if getCache.Int64() > 0 {
@@ -49,6 +54,12 @@ func (s *sGameKv) SavesV1() (err error) {
 	// 从Redis列表中获取所有用户KV索引的键
 	//keys, err := utils.RedisScan("user:kv:*")
 	err = tools.Redis.RedisScanV2("user:kv:*", func(keys []string) (err error) {
+		//判断是否超时
+		if gtime.Now().After(RunTimeMax) {
+			g.Log().Debug(ctx, "执行超时了,停止执行！")
+			return
+		}
+
 		// 定义用于存储用户数据的结构体
 		type ListData struct {
 			Uid int64       `json:"uid"`
@@ -121,18 +132,6 @@ func (s *sGameKv) SavesV1() (err error) {
 
 		return
 	})
-
-	//if err != nil {
-	//	return err
-	//}
-	////跳过
-	//if len(keys) == 0 {
-	//	return
-	//}
-	////一次最多处理10w条
-	//if len(keys) > 10000 {
-	//	keys = keys[:10000]
-	//}
 
 	return
 }
