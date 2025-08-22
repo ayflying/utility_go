@@ -22,7 +22,7 @@ func Boot() (err error) {
 		err = service.GameKv().SavesV1()
 		err = service.GameAct().Saves(ctx)
 		return err
-	})
+	}, true)
 
 	//初始化自启动方法
 	for _, v := range _func {

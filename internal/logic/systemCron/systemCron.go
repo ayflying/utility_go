@@ -81,7 +81,7 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 	var _func2 = func(ctx context.Context) error {
 		return _func()
 	}
-	s.AddCronV2(typ, _func2)
+	s.AddCronV2(typ, _func2, true)
 }
 
 // AddCronV2  添加一个定时任务到相应的调度列表中。
@@ -92,9 +92,12 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 // @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
 // @param unique: 是否只在唯一服务器上执行
 func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error, unique ...bool) {
-	//如果
-	if g.Cfg().MustGet(gctx.New(), "game.cron_close").Bool() {
-		return
+	//如果传过来的任务是唯一性的
+	if len(unique) > 0 && unique[0] {
+		// 如果当前服务器配置关闭任务，不执行当前服务器的唯一任务
+		if g.Cfg().MustGet(gctx.New(), "game.cron_close").Bool() {
+			return
+		}
 	}
 
 	//加锁
