@@ -81,6 +81,7 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 	var _func2 = func(ctx context.Context) error {
 		return _func()
 	}
+	// 老版本计划任务全都是主服务器唯一执行
 	s.AddCronV2(typ, _func2, true)
 }
 
@@ -90,12 +91,12 @@ func (s *sSystemCron) AddCron(typ v1.CronType, _func func() error) {
 // @receiver s: sSystemCron的实例，代表一个调度系统。
 // @param typ: 任务的类型，决定该任务将被添加到哪个列表中。对应不同的时间间隔。
 // @param _func: 要添加的任务函数，该函数执行时应该返回一个error。
-// @param unique: 是否只在唯一服务器上执行
-func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error, unique ...bool) {
-	//如果传过来的任务是唯一性的
-	if len(unique) > 0 && unique[0] {
-		// 如果当前服务器配置关闭任务，不执行当前服务器的唯一任务
-		if g.Cfg().MustGet(gctx.New(), "game.cron_close").Bool() {
+// @param _isMain: 是否只在主服务器上执行一次,true 唯一执行，false 全局执行不判断唯一
+func (s *sSystemCron) AddCronV2(typ v1.CronType, _func func(context.Context) error, _isMain ...bool) {
+	//如果传过来的任务是需要主服务器执行一次
+	if len(_isMain) > 0 && _isMain[0] {
+		//判断当前是否为主服务器
+		if !g.Cfg().MustGet(gctx.New(), "game.cron_main").Bool() {
 			return
 		}
 	}
