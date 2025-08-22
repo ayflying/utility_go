@@ -110,6 +110,7 @@ func (s *sGameAct) Set(uid int64, actId int, data interface{}) (err error) {
 
 func (s *sGameAct) Saves(ctx context.Context) (err error) {
 	getCache, _ := pkg.Cache("redis").Get(nil, "cron:game_act")
+	g.Log().Debug(ctx, "开始执行游戏act数据保存了")
 	//如果没有执行过，设置时间戳
 	if getCache.Int64() > 0 {
 		return
@@ -122,8 +123,10 @@ func (s *sGameAct) Saves(ctx context.Context) (err error) {
 	ActList.Iterator(func(i interface{}) bool {
 		//在时间内允许执行
 		if gtime.Now().Before(RunTimeMax) {
-			g.Log().Errorf(ctx, "开始执行游戏act数据保存: act%v", i)
+			g.Log().Debug(ctx, "开始执行游戏act数据保存: act%v", i)
 			err = s.Save(ctx, i.(int))
+		} else {
+			g.Log().Errorf(ctx, "游戏act数据保存超时: act=%v", i)
 		}
 		return true
 	})

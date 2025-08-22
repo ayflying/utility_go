@@ -56,7 +56,7 @@ func (s *sGameKv) SavesV1() (err error) {
 	err = tools.Redis.RedisScanV2("user:kv:*", func(keys []string) (err error) {
 		//判断是否超时
 		if gtime.Now().After(RunTimeMax) {
-			g.Log().Debug(ctx, "执行超时了,停止执行！")
+			g.Log().Error(ctx, "执行超时了,停止执行！")
 			return
 		}
 
