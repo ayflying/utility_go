@@ -213,9 +213,8 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
 				_, err2 := g.Model(Name).Where(do.GameAct{
-					Uid:       v.Uid,
-					ActId:     v.ActId,
-					UpdatedAt: v.UpdatedAt,
+					Uid:   v.Uid,
+					ActId: v.ActId,
 				}).Data(v).Update()
 				if err2 != nil {
 					g.Log().Error(ctx, err2)
