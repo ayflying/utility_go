@@ -212,12 +212,16 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		if len(delKey) > 0 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
-				_, err2 := g.Model(Name).Where(do.GameAct{
+				updateRes, err2 := g.Model(Name).Where(do.GameAct{
 					Uid:   v.Uid,
 					ActId: v.ActId,
 				}).Data(v).Update()
 				if err2 != nil {
 					g.Log().Error(ctx, err2)
+					return
+				}
+				if row, _ := updateRes.RowsAffected(); row == 0 {
+					g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
 					return
 				}
 			}
