@@ -184,6 +184,12 @@ func (s *Mod) ListObjects(bucketName string, prefix string) (res <-chan minio.Ob
 	return
 }
 
+// StatObject 获取指定存储桶中指定文件的元数据信息
+func (s *Mod) StatObject(bucketName string, objectName string) (res minio.ObjectInfo, err error) {
+	res, err = s.client.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
+	return
+}
+
 // SetBucketPolicy 设置指定存储桶或对象前缀的访问策略
 // 目前使用固定的策略，可根据需求修改
 func (s *Mod) SetBucketPolicy(bucketName string, prefix string) (err error) {
