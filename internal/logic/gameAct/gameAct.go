@@ -2,6 +2,7 @@ package gameAct
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -146,7 +147,8 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 	err = tools.Redis.RedisScanV2(cacheKey, func(keys []string) (err error) {
 		//判断是否超时
 		if gtime.Now().After(RunTimeMax) {
-			g.Log().Debug(ctx, "执行超时了,停止执行！")
+			g.Log().Debug(ctx, "act执行超时了,停止执行！")
+			err = errors.New("act执行超时了,停止执行！")
 			return
 		}
 		var add = make([]*entity.GameAct, 0)
@@ -209,6 +211,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		}
 
 		//批量写入数据库
+		updateCount := 0
 		if len(delKey) > 0 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
@@ -224,7 +227,10 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
 					return
 				}
+				updateCount++
 			}
+			g.Log().Debugf(ctx, "当前 %v 更新数据库: %v 条", actId, updateCount)
+
 			update = make([]*entity.GameAct, 0)
 			var count int64
 
@@ -237,6 +243,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					return
 				}
 				count, _ = dbRes.RowsAffected()
+				g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
 			}
 
 			for _, v := range delKey {
@@ -247,7 +254,6 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			}
 			delKey = make([]string, 0)
 
-			g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
 		}
 
 		if err != nil {

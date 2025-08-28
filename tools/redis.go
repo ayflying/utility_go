@@ -70,6 +70,9 @@ func (r *redis) RedisScanV2(cacheKey string, _func func([]string) error, _key ..
 
 		if len(newKeys) > 0 {
 			err = _func(newKeys)
+			if err != nil {
+				return err
+			}
 		}
 
 		//这个要放在最后
