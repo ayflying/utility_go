@@ -31,7 +31,7 @@ type DataType struct {
 	Url           string `json:"url"`             // S3 服务的访问 URL
 	BucketName    string `json:"bucket_name"`     // 默认存储桶名称
 	BucketNameCdn string `json:"bucket_name_cdn"` // CDN 存储桶名称
-	Provider      string `json:"provider"`        // S3 服务的提供方
+	//Provider      string `json:"provider"`        // S3 服务的提供方
 }
 
 // Mod 定义了 S3 模块的结构体，包含一个 S3 客户端实例和配置信息
