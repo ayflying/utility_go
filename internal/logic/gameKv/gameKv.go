@@ -53,6 +53,15 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 		pkg.Cache("redis").Set(nil, "cron:game_kv", gtime.Now().Unix(), time.Hour)
 	}
 
+	// 定义用于存储用户数据的结构体
+	type ListData struct {
+		Uid int64       `json:"uid"`
+		Kv  interface{} `json:"kv"`
+	}
+	var list []*ListData
+	// 初始化列表，长度与keys数组一致
+	list = make([]*ListData, 0)
+
 	// 从Redis列表中获取所有用户KV索引的键
 	//keys, err := utils.RedisScan("user:kv:*")
 	err = tools.Redis.RedisScanV2("user:kv:*", func(keys []string) (err error) {
@@ -63,16 +72,8 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 			return
 		}
 
-		// 定义用于存储用户数据的结构体
-		type ListData struct {
-			Uid int64       `json:"uid"`
-			Kv  interface{} `json:"kv"`
-		}
-		var list []*ListData
-		// 初始化列表，长度与keys数组一致
-		list = make([]*ListData, 0)
 		//需要删除的key
-		var delKey []string
+
 		// 遍历keys，获取每个用户的数据并填充到list中
 		for _, cacheKey := range keys {
 			//g.Log().Infof(ctx, "保存用户kv数据%v", v)
@@ -105,29 +106,21 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 				Uid: uid,
 				Kv:  data,
 			})
-
-			delKey = append(delKey, cacheKey)
 		}
 
 		// 将列表数据保存到数据库
-		if len(list) > 0 {
-			_, err2 := g.Model("game_kv").Batch(30).Data(list).Save()
-			list = make([]*ListData, 0)
+		if len(list) > 100 {
+			_, err2 := g.Model("game_kv").Data(list).Save()
+
 			if err2 != nil {
 				g.Log().Error(ctx, err2)
 				return
 			}
-
-			//批量删除key
-			for _, v := range delKey {
-				_, err2 = g.Redis().Del(ctx, v)
-				if err2 != nil {
-					g.Log().Errorf(ctx, "删除存档失败：%v,err=%v", v, err2)
-				}
+			//删除当前key
+			for _, v := range list {
+				go s.DelCacheKey(v.Uid)
 			}
-
-			delKey = make([]string, 0)
-
+			list = make([]*ListData, 0)
 		}
 		if err != nil {
 			g.Log().Error(ctx, "当前kv数据入库失败: %v", err)
@@ -137,4 +130,13 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 	})
 
 	return
+}
+
+// 删除缓存key
+func (s *sGameKv) DelCacheKey(uid int64) {
+	cacheKey := fmt.Sprintf("user:kv:%v", uid)
+	_, err := g.Redis().Del(ctx, cacheKey)
+	if err != nil {
+		g.Log().Error(ctx, err)
+	}
 }

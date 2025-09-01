@@ -225,7 +225,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				}
 				if row, _ := updateRes.RowsAffected(); row == 0 {
 					g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
-					return
+					continue
 				}
 
 				//删除缓存
@@ -255,7 +255,6 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					g.Log().Debugf(ctx, "当前act：%v，add写入数据: %v,内容：%v", vTemp.ActId, vTemp.Uid, vTemp.Action)
 				}
 				return
-
 			}
 
 			for _, v2 := range add {
