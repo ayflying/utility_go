@@ -5,6 +5,10 @@
 
 package service
 
+import (
+	"context"
+)
+
 type (
 	IGameKv interface {
 		// SavesV1 方法
@@ -12,7 +16,7 @@ type (
 		// @Description: 保存用户KV数据列表。
 		// @receiver s: sGameKv的实例。
 		// @return err: 错误信息，如果操作成功，则为nil。
-		SavesV1() (err error)
+		SavesV1(ctx context.Context) (err error)
 	}
 )
 

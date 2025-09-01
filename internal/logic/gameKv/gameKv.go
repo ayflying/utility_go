@@ -1,6 +1,7 @@
 package gameKv
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -39,7 +40,7 @@ func init() {
 // @Description: 保存用户KV数据列表。
 // @receiver s: sGameKv的实例。
 // @return err: 错误信息，如果操作成功，则为nil。
-func (s *sGameKv) SavesV1() (err error) {
+func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 	// 最大允许执行时间
 	RunTimeMax = gtime.Now().Add(time.Minute * 30)
 	g.Log().Debug(ctx, "开始执行游戏kv数据保存")

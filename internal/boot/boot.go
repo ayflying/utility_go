@@ -5,6 +5,7 @@ import (
 
 	v1 "github.com/ayflying/utility_go/api/system/v1"
 	"github.com/ayflying/utility_go/service"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 )
 
@@ -19,9 +20,14 @@ func Boot() (err error) {
 
 	//用户活动持久化每小时执行一次
 	service.SystemCron().AddCronV2(v1.CronType_HOUR, func(ctx context.Context) error {
-		err = service.GameKv().SavesV1()
-		err = service.GameAct().Saves(ctx)
-		return err
+		go func() {
+			err = service.GameKv().SavesV1(ctx)
+			err = service.GameAct().Saves(ctx)
+			if err != nil {
+				g.Log().Error(ctx, err)
+			}
+		}()
+		return nil
 	}, true)
 
 	//初始化自启动方法

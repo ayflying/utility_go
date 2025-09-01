@@ -60,7 +60,7 @@ type sSystemCron struct {
 func New() *sSystemCron {
 	return &sSystemCron{
 		taskChan:    make(chan func(context.Context) error, 2),
-		TaskTimeout: time.Minute * 30,
+		TaskTimeout: time.Minute * 60,
 	}
 }
 
@@ -333,7 +333,7 @@ func (s *sSystemCron) RunFuncChan() {
 			//ctx := gctx.New()
 			func() {
 				//超时释放资源
-				ctx, cancel := context.WithTimeout(context.Background(), s.TaskTimeout)
+				ctx, cancel := context.WithTimeout(gctx.New(), s.TaskTimeout)
 				defer cancel()
 
 				// 使用匿名函数包裹来捕获 panic

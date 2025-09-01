@@ -212,7 +212,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 		//批量写入数据库
 		updateCount := 0
-		if len(delKey) > 0 {
+		if len(delKey) > 200 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
 				updateRes, err2 := g.Model(Name).Where(do.GameAct{
@@ -235,7 +235,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			var count int64
 
 			if len(add) > 0 {
-				dbRes, err2 := g.Model(Name).Batch(50).Data(add).Save()
+				dbRes, err2 := g.Model(Name).Data(add).Save()
 				add = make([]*entity.GameAct, 0)
 				err = err2
 				if err != nil {
@@ -243,7 +243,15 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					return
 				}
 				count, _ = dbRes.RowsAffected()
-				g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
+				if count == 0 {
+					g.Log().Error(ctx, "当前 %v 写入数据库: %v 条", actId, count)
+					for _, vTemp := range add {
+						g.Log().Debugf(ctx, "当前act：%v，add写入数据: %v,内容：%v", vTemp.ActId, vTemp.Uid, vTemp.Action)
+					}
+					return
+
+				}
+				//g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
 			}
 
 			for _, v := range delKey {
