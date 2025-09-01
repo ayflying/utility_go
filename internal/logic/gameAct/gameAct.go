@@ -143,6 +143,9 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 	//	keys = keys[:10000]
 	//}
 
+	var add = make([]*entity.GameAct, 0)
+	var update = make([]*entity.GameAct, 0)
+
 	//循环获取缓存数据
 	err = tools.Redis.RedisScanV2(cacheKey, func(keys []string) (err error) {
 		//判断是否超时
@@ -151,9 +154,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			err = errors.New("act执行超时了,停止执行！")
 			return
 		}
-		var add = make([]*entity.GameAct, 0)
-		var update = make([]*entity.GameAct, 0)
-		var delKey []string
+
 		for _, cacheKey = range keys {
 			result := strings.Split(cacheKey, ":")
 			actId, err = strconv.Atoi(result[1])
@@ -206,13 +207,12 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				data.Action = actionData
 				update = append(update, data)
 			}
-			//最后删除key
-			delKey = append(delKey, cacheKey)
 		}
 
 		//批量写入数据库
 		updateCount := 0
-		if len(delKey) > 200 {
+
+		if len(update) > 100 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
 				updateRes, err2 := g.Model(Name).Where(do.GameAct{
@@ -227,41 +227,44 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 					g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
 					return
 				}
+
+				//删除缓存
+				go s.DelCacheKey(v.ActId, v.Uid)
+
 				updateCount++
+				update = make([]*entity.GameAct, 0)
 			}
 			g.Log().Debugf(ctx, "当前 %v 更新数据库: %v 条", actId, updateCount)
-
 			update = make([]*entity.GameAct, 0)
-			var count int64
+		}
 
-			if len(add) > 0 {
-				dbRes, err2 := g.Model(Name).Data(add).Save()
-				add = make([]*entity.GameAct, 0)
-				err = err2
-				if err != nil {
-					g.Log().Error(ctx, err2)
-					return
-				}
-				count, _ = dbRes.RowsAffected()
-				if count == 0 {
-					g.Log().Error(ctx, "当前 %v 写入数据库: %v 条", actId, count)
-					for _, vTemp := range add {
-						g.Log().Debugf(ctx, "当前act：%v，add写入数据: %v,内容：%v", vTemp.ActId, vTemp.Uid, vTemp.Action)
-					}
-					return
+		var count int64
 
+		if len(add) > 100 {
+			dbRes, err2 := g.Model(Name).Data(add).Save()
+
+			err = err2
+			if err != nil {
+				g.Log().Error(ctx, err2)
+				return
+			}
+			count, _ = dbRes.RowsAffected()
+			if count == 0 {
+				g.Log().Error(ctx, "当前 %v 写入数据库: %v 条", actId, count)
+				for _, vTemp := range add {
+					g.Log().Debugf(ctx, "当前act：%v，add写入数据: %v,内容：%v", vTemp.ActId, vTemp.Uid, vTemp.Action)
 				}
-				//g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
+				return
+
 			}
 
-			for _, v := range delKey {
-				_, err = g.Redis().Del(ctx, v)
-				if err != nil {
-					g.Log().Error(ctx, err)
-				}
+			for _, v2 := range add {
+				//删除缓存
+				go s.DelCacheKey(v2.ActId, v2.Uid)
 			}
-			delKey = make([]string, 0)
 
+			//g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
+			add = make([]*entity.GameAct, 0)
 		}
 
 		if err != nil {
@@ -272,6 +275,15 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 	})
 
 	return
+}
+
+// 删除缓存key
+func (s *sGameAct) DelCacheKey(aid int, uid int64) {
+	cacheKey := fmt.Sprintf("act:%v:%v", aid, uid)
+	_, err := g.Redis().Del(ctx, cacheKey)
+	if err != nil {
+		g.Log().Error(ctx, err)
+	}
 }
 
 // 清空GetRedDot缓存
