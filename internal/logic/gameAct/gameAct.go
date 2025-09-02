@@ -203,7 +203,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		//批量写入数据库
 		updateCount := 0
 
-		g.Log().Debugf(ctx, "当前 %v 要更新的数据: %v 条", actId, len(update))
+		//g.Log().Debugf(ctx, "当前 %v 要更新的数据: %v 条", actId, len(update))
 		if len(update) > 100 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
@@ -231,7 +231,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		}
 
 		var count int64
-		g.Log().Debugf(ctx, "当前 %v 要添加的数据: %v 条", actId, len(add))
+		//g.Log().Debugf(ctx, "当前 %v 要添加的数据: %v 条", actId, len(add))
 		if len(add) > 100 {
 			dbRes, err2 := g.Model(Name).Data(add).Save()
 
