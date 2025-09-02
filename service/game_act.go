@@ -63,7 +63,7 @@ type (
 		// @param add []*entity.GameAct: 添加数据
 		// @param update []*entity.GameAct: 更新数据
 		// @return err error: 返回错误信息
-		SaveV2(ctx context.Context, cacheKey string, add []*entity.GameAct, update []*entity.GameAct) (err error)
+		SaveV2(ctx context.Context, cacheKey string) (err error)
 		// Cache2Sql 缓存持久化到数据库
 		// @Description: 缓存持久化到数据库
 		// @receiver s *sGameAct: 游戏活动服务结构体指针
@@ -71,7 +71,7 @@ type (
 		// @param add []*entity.GameAct: 添加数据
 		// @param update []*entity.GameAct: 更新数据
 		// @return err error: 返回错误信息
-		Cache2Sql(ctx context.Context, add []*entity.GameAct, update []*entity.GameAct) (err error)
+		Cache2Sql(ctx context.Context, add []*entity.GameAct, update []*entity.GameAct)
 		// 删除缓存key
 		DelCacheKey(ctx context.Context, aid int, uid int64)
 		// 清空GetRedDot缓存
