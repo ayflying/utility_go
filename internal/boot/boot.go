@@ -19,12 +19,12 @@ func Boot() (err error) {
 	//err = service.SystemCron().StartCron()
 
 	//用户活动持久化每小时执行一次
-	service.SystemCron().AddCronV2(v1.CronType_HOUR, func(ctx context.Context) error {
+	service.SystemCron().AddCronV2(v1.CronType_HOUR, func(context.Context) error {
 		go func() {
-			err = service.GameKv().SavesV1(ctx)
-			err = service.GameAct().Saves(ctx)
+			err = service.GameKv().SavesV1()
+			err = service.GameAct().Saves()
 			if err != nil {
-				g.Log().Error(ctx, err)
+				g.Log().Error(gctx.New(), err)
 			}
 		}()
 		return nil

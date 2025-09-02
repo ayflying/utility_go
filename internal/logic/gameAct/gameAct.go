@@ -21,7 +21,6 @@ import (
 )
 
 var (
-	ctx        = gctx.New()
 	Name       = "game_act"
 	ActList    = gset.New(true)
 	RunTimeMax *gtime.Time
@@ -47,6 +46,7 @@ func init() {
 // @return data *v1.Act: 返回活动信息结构体指针
 // @return err error: 返回错误信息
 func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
+	var ctx = gctx.New()
 	if uid == 0 || actId == 0 {
 		g.Log().Error(ctx, "当前参数为空")
 		return
@@ -89,6 +89,7 @@ func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
 // @param data interface{}: 要存储的活动信息数据。
 // @return err error: 返回错误信息，如果操作成功，则返回nil。
 func (s *sGameAct) Set(uid int64, actId int, data interface{}) (err error) {
+	var ctx = gctx.New()
 	if uid == 0 || actId == 0 {
 		g.Log().Error(ctx, "当前参数为空")
 		return
@@ -109,7 +110,8 @@ func (s *sGameAct) Set(uid int64, actId int, data interface{}) (err error) {
 	return
 }
 
-func (s *sGameAct) Saves(ctx context.Context) (err error) {
+func (s *sGameAct) Saves() (err error) {
+	var ctx = gctx.New()
 	g.Log().Debug(ctx, "开始执行游戏act数据保存了")
 	//如果没有执行过，设置时间戳
 	// 最大允许执行时间
@@ -118,10 +120,10 @@ func (s *sGameAct) Saves(ctx context.Context) (err error) {
 	ActList.Iterator(func(i interface{}) bool {
 		//在时间内允许执行
 		if gtime.Now().Before(RunTimeMax) {
-			g.Log().Debug(ctx, "开始执行游戏act数据保存: act%v", i)
+			g.Log().Debugf(ctx, "开始执行游戏act数据保存:act=%v", i)
 			err = s.Save(ctx, i.(int))
 		} else {
-			g.Log().Errorf(ctx, "游戏act数据保存超时: act=%v", i)
+			g.Log().Errorf(ctx, "游戏act数据保存超时:act=%v", i)
 		}
 		return true
 	})
@@ -131,12 +133,6 @@ func (s *sGameAct) Saves(ctx context.Context) (err error) {
 func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 	cacheKey := fmt.Sprintf("act:%v:*", actId)
-	//获取当前用户的key值
-	//keys, err := utils.RedisScan(cacheKey)
-	//if len(keys) > 10000 {
-	//	keys = keys[:10000]
-	//}
-
 	var add = make([]*entity.GameAct, 0)
 	var update = make([]*entity.GameAct, 0)
 
@@ -156,6 +152,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 			uid = gconv.Int64(result[2])
 			//uid, err = strconv.ParseInt(result[2], 10, 64)
 			if err != nil {
+				g.Log().Error(ctx, err)
 				continue
 			}
 
@@ -184,7 +181,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				ActId: actId,
 			}).Fields("uid,act_id").Scan(&data)
 			if err != nil {
-				g.Log().Debugf(ctx, "当前数据错误: %v", cacheKey)
+				g.Log().Errorf(ctx, "当前数据错误: %v", cacheKey)
 				continue
 			}
 			actionData := cacheGet.String()
@@ -206,6 +203,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		//批量写入数据库
 		updateCount := 0
 
+		g.Log().Debugf(ctx, "当前 %v 要更新的数据: %v 条", actId, len(update))
 		if len(update) > 100 {
 			for _, v := range update {
 				v.UpdatedAt = gtime.Now()
@@ -223,7 +221,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				}
 
 				//删除缓存
-				go s.DelCacheKey(v.ActId, v.Uid)
+				go s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 				updateCount++
 				update = make([]*entity.GameAct, 0)
@@ -233,7 +231,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 		}
 
 		var count int64
-
+		g.Log().Debugf(ctx, "当前 %v 要添加的数据: %v 条", actId, len(add))
 		if len(add) > 100 {
 			dbRes, err2 := g.Model(Name).Data(add).Save()
 
@@ -253,7 +251,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 
 			for _, v2 := range add {
 				//删除缓存
-				go s.DelCacheKey(v2.ActId, v2.Uid)
+				go s.DelCacheKey(ctx, v2.ActId, v2.Uid)
 			}
 
 			//g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
@@ -271,7 +269,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 }
 
 // 删除缓存key
-func (s *sGameAct) DelCacheKey(aid int, uid int64) {
+func (s *sGameAct) DelCacheKey(ctx context.Context, aid int, uid int64) {
 	cacheKey := fmt.Sprintf("act:%v:%v", aid, uid)
 	_, err := g.Redis().Del(ctx, cacheKey)
 	if err != nil {
@@ -284,12 +282,13 @@ func (s *sGameAct) RefreshGetRedDotCache(uid int64) {
 	cacheKey := fmt.Sprintf("gameAct:GetRedDot:%s:%d", gtime.Now().Format("d"), uid)
 	_, err := pkg.Cache("redis").Remove(gctx.New(), cacheKey)
 	if err != nil {
-		g.Log().Error(ctx, err)
+		g.Log().Error(gctx.New(), err)
 		g.Dump(err)
 	}
 }
 
 func (s *sGameAct) Del(uid int64, actId int) {
+	var ctx = gctx.New()
 	if uid == 0 || actId == 0 {
 		g.Log().Error(ctx, "当前参数为空")
 		return

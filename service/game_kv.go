@@ -16,7 +16,9 @@ type (
 		// @Description: 保存用户KV数据列表。
 		// @receiver s: sGameKv的实例。
 		// @return err: 错误信息，如果操作成功，则为nil。
-		SavesV1(ctx context.Context) (err error)
+		SavesV1() (err error)
+		// 删除缓存key
+		DelCacheKey(ctx context.Context, uid int64)
 	}
 )
 

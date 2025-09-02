@@ -48,7 +48,6 @@ func (r *redis) RedisScan(cacheKey string, _key ...string) (keys []string, err e
 
 // redis 批量获取大量数据
 func (r *redis) RedisScanV2(cacheKey string, _func func([]string) error, _key ...string) error {
-
 	//var keys []string
 	var err error
 
@@ -67,7 +66,6 @@ func (r *redis) RedisScanV2(cacheKey string, _func func([]string) error, _key ..
 			g.Log().Errorf(ctx, "Scan failed: %v", err)
 			break
 		}
-
 		if len(newKeys) > 0 {
 			err = _func(newKeys)
 			if err != nil {

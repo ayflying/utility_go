@@ -18,7 +18,6 @@ import (
 )
 
 var (
-	ctx        = gctx.New()
 	Name       = "game_kv"
 	RunTimeMax *gtime.Time
 )
@@ -40,7 +39,8 @@ func init() {
 // @Description: 保存用户KV数据列表。
 // @receiver s: sGameKv的实例。
 // @return err: 错误信息，如果操作成功，则为nil。
-func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
+func (s *sGameKv) SavesV1() (err error) {
+	var ctx = gctx.New()
 	// 最大允许执行时间
 	RunTimeMax = gtime.Now().Add(time.Minute * 30)
 	g.Log().Debug(ctx, "开始执行游戏kv数据保存")
@@ -110,7 +110,7 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 			}
 			//删除当前key
 			for _, v := range list {
-				go s.DelCacheKey(v.Uid)
+				go s.DelCacheKey(ctx, v.Uid)
 			}
 			list = make([]*ListData, 0)
 		}
@@ -125,7 +125,7 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 }
 
 // 删除缓存key
-func (s *sGameKv) DelCacheKey(uid int64) {
+func (s *sGameKv) DelCacheKey(ctx context.Context, uid int64) {
 	cacheKey := fmt.Sprintf("user:kv:%v", uid)
 	_, err := g.Redis().Del(ctx, cacheKey)
 	if err != nil {
