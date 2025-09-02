@@ -22,7 +22,7 @@ func Boot() (err error) {
 	service.SystemCron().AddCronV2(v1.CronType_HOUR, func(context.Context) error {
 		go func() {
 			err = service.GameKv().SavesV1()
-			err = service.GameAct().Saves()
+			err = service.GameAct().SavesV2()
 			if err != nil {
 				g.Log().Error(gctx.New(), err)
 			}
