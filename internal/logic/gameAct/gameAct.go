@@ -408,7 +408,7 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 			//删除缓存
 			go s.DelCacheKey(ctx, v.ActId, v.Uid)
 
-			//updateCount++
+			updateCount++
 			update = make([]*entity.GameAct, 0)
 		}
 
