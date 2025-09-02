@@ -45,14 +45,6 @@ func (s *sGameKv) SavesV1(ctx context.Context) (err error) {
 	RunTimeMax = gtime.Now().Add(time.Minute * 30)
 	g.Log().Debug(ctx, "开始执行游戏kv数据保存")
 
-	getCache, err := pkg.Cache("redis").Get(nil, "cron:game_kv")
-	//如果没有执行过，设置时间戳
-	if getCache.Int64() > 0 {
-		return
-	} else {
-		pkg.Cache("redis").Set(nil, "cron:game_kv", gtime.Now().Unix(), time.Hour)
-	}
-
 	// 定义用于存储用户数据的结构体
 	type ListData struct {
 		Uid int64       `json:"uid"`
