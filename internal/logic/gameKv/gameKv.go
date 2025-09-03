@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 var (
@@ -72,19 +72,17 @@ func (s *sGameKv) SavesV1() (err error) {
 			//uid := v.Int64()
 			//cacheKey = "user:kv:" + strconv.FormatInt(uid, 10)
 			result := strings.Split(cacheKey, ":")
-			var uid int64
-			uid, err = strconv.ParseInt(result[2], 10, 64)
+			var uid = gconv.Int64(result[2])
+			if uid == 0 {
+				continue
+			}
+			//uid, err = strconv.ParseInt(result[2], 10, 64)
 			if err != nil {
 				g.Log().Error(ctx, err)
 				g.Redis().Del(ctx, cacheKey)
 				continue
 			}
 
-			////如果1天没有活跃，跳过
-			//user, _ := service.MemberUser().Info(uid)
-			//if user.UpdatedAt.Seconds < gtime.Now().Add(consts.ActSaveTime).Unix() {
-			//	continue
-			//}
 			//如果有活跃，跳过持久化
 			if getBool, _ := pkg.Cache("redis").
 				Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
@@ -94,6 +92,9 @@ func (s *sGameKv) SavesV1() (err error) {
 			get, _ := g.Redis().Get(ctx, cacheKey)
 			var data interface{}
 			get.Scan(&data)
+			if data == nil {
+				continue
+			}
 			list = append(list, &ListData{
 				Uid: uid,
 				Kv:  data,
@@ -103,21 +104,17 @@ func (s *sGameKv) SavesV1() (err error) {
 		// 将列表数据保存到数据库
 		if len(list) > 100 {
 			_, err2 := g.Model("game_kv").Data(list).Save()
-
 			if err2 != nil {
-				g.Log().Error(ctx, err2)
+				g.Log().Error(ctx, "当前kv数据入库失败: %v", err2)
+				err = err2
 				return
 			}
 			//删除当前key
 			for _, v := range list {
-				go s.DelCacheKey(ctx, v.Uid)
+				s.DelCacheKey(ctx, v.Uid)
 			}
 			list = make([]*ListData, 0)
 		}
-		if err != nil {
-			g.Log().Error(ctx, "当前kv数据入库失败: %v", err)
-		}
-
 		return
 	})
 
@@ -126,6 +123,12 @@ func (s *sGameKv) SavesV1() (err error) {
 
 // 删除缓存key
 func (s *sGameKv) DelCacheKey(ctx context.Context, uid int64) {
+	//如果有活跃，跳过删除
+	if getBool, _ := pkg.Cache("redis").
+		Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
+		return
+	}
+
 	cacheKey := fmt.Sprintf("user:kv:%v", uid)
 	_, err := g.Redis().Del(ctx, cacheKey)
 	if err != nil {

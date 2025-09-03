@@ -498,6 +498,12 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context) {
 
 // 删除缓存key
 func (s *sGameAct) DelCacheKey(ctx context.Context, aid int, uid int64) {
+	//如果有活跃，跳过删除
+	if getBool, _ := pkg.Cache("redis").
+		Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
+		return
+	}
+
 	cacheKey := fmt.Sprintf("act:%v:%v", aid, uid)
 	_, err := g.Redis().Del(ctx, cacheKey)
 	if err != nil {
