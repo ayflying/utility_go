@@ -471,9 +471,9 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 // Cache2AddChan 批量添加数据库
 func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *entity.GameAct) {
 	//批量写入数据库计数
-	var addCount int
+	var addCount int64
 	//批量更新数据库计数
-	var updateCount int
+	var updateCount int64
 	//通道关闭标志
 	addClosed := false
 	updateClosed := false
@@ -498,11 +498,12 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 				g.Log().Error(ctx, err2)
 				continue
 			}
-			if row, _ := addRes.RowsAffected(); row == 0 {
-				g.Log().Error(ctx, "本次新增为0，新增数据失败: %v", v)
-				continue
-			}
-			addCount++
+			//if row, _ := addRes.RowsAffected(); row == 0 {
+			//	g.Log().Error(ctx, "本次新增为0，新增数据失败: %v", v)
+			//	continue
+			//}
+			row, _ := addRes.RowsAffected()
+			addCount += row
 			//删除缓存
 			s.DelCacheKey(ctx, v.ActId, v.Uid)
 
@@ -521,7 +522,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 				continue
 			}
 			if row, _ := updateRes.RowsAffected(); row == 0 {
-				g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
+				//g.Log().Error(ctx, "本次更新为0，更新数据失败: %v", v)
 				continue
 			}
 			//删除缓存
