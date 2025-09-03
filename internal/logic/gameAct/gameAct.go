@@ -498,10 +498,10 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 				g.Log().Error(ctx, err2)
 				continue
 			}
-			//if row, _ := addRes.RowsAffected(); row == 0 {
-			//	g.Log().Error(ctx, "本次新增为0，新增数据失败: %v", v)
-			//	continue
-			//}
+			if row, _ := addRes.RowsAffected(); row == 0 {
+				//g.Log().Error(ctx, "本次新增为0，新增数据失败: %v", v)
+				continue
+			}
 			row, _ := addRes.RowsAffected()
 			addCount += row
 			//删除缓存
