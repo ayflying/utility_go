@@ -315,7 +315,8 @@ func (s *sGameAct) SavesV2() (err error) {
 		close(updateChan)
 	}()
 	// 启动缓存数据到数据库通道
-	s.Cache2SqlChan(ctx)
+	go s.Cache2AddChan(ctx)
+	go s.Cache2UpdateChan(ctx)
 
 	return
 }
@@ -449,12 +450,12 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 	return
 }
 
-// Cache2SqlChan 缓存持久化到数据库
+// Cache2UpdateChan 缓存持久化到数据库
 // @Description: 缓存持久化到数据库
 // @receiver s *sGameAct: 游戏活动服务结构体指针
 // @param ctx context.Context: 上下文对象
-func (s *sGameAct) Cache2SqlChan(ctx context.Context) {
-	//批量写入数据库
+func (s *sGameAct) Cache2UpdateChan(ctx context.Context) {
+	//批量更新数据库
 	updateCount := 0
 	for v := range updateChan {
 		v.UpdatedAt = gtime.Now()
@@ -475,7 +476,12 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context) {
 		updateCount++
 	}
 	g.Log().Debugf(ctx, "act当前更新数据库: %v 条", updateCount)
+	return
+}
 
+// Cache2AddChan 批量添加数据库
+func (s *sGameAct) Cache2AddChan(ctx context.Context) {
+	//批量写入数据库
 	var addCount int64
 	for v := range addChan {
 		addRes, err2 := g.Model(Name).Data(v).Insert()
