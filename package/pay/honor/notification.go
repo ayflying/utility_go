@@ -32,7 +32,16 @@ func (p *Pay) Notification(r *http.Request) {
 // ConsumeProduct 商品消耗
 func (p *Pay) ConsumeProduct(purchaseToken string) (err error) {
 	url := Host + "/iap/server/consumeProduct"
-	get, err := g.Client().ContentJson().Post(gctx.New(), url, g.Map{
+	//获取token
+	token, err := p.GetToken(gctx.New())
+	if err != nil {
+		return
+	}
+	get, err := g.Client().ContentJson().Header(g.MapStrStr{
+		"access-token":  token,
+		"x-iap-appid":   p.AppId,
+		"purchaseToken": purchaseToken,
+	}).Post(gctx.New(), url, g.Map{
 		"purchaseToken":      purchaseToken,
 		"developerChallenge": grand.S(16),
 	})
