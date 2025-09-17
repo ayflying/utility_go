@@ -268,7 +268,7 @@ func (sdk *SDK) Shutdown() {
 const datetimeFmt = time.DateOnly + " " + time.TimeOnly
 
 // 记录日志
-func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string) {
+func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string, customEventTime ...time.Time) {
 	loc := time.Local
 	if _loc := getLocationMapValue(timezone); _loc != nil {
 		loc = _loc
@@ -276,52 +276,58 @@ func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string)
 	if len(property) == 0 {
 		property = map[string]any{"ts": gtime.Now().Timestamp()}
 	}
+	var et *gtime.Time
+	if len(customEventTime) > 0 {
+		et = gtime.NewFromTime(customEventTime[0])
+	} else {
+		et = gtime.Now()
+	}
 	log := GameLog{
 		Uid:          uid,
 		Event:        event,
 		Property:     property,
-		EventTimems:  gtime.Now().TimestampMilli(),
-		EventTimeLoc: gtime.Now().In(loc).Format(datetimeFmt),
+		EventTimems:  et.TimestampMilli(),
+		EventTimeLoc: et.In(loc).Format(datetimeFmt),
 	}
 	// 线程安全
 	sdk.bufferChan <- log
 }
 
 // 按服务器时区记录日志
-func (sdk *SDK) LogLtz(uid, event string, property map[string]any) {
-	sdk.Log(uid, event, property, time.Local.String())
+func (sdk *SDK) LogLtz(uid, event string, property map[string]any, customEventTime ...time.Time) {
+	sdk.Log(uid, event, property, time.Local.String(), customEventTime...)
 }
 
 // 用户属性初始化
-func (sdk *SDK) Uinit(uid string, property map[string]any, timezone string) {
-	sdk.Log(uid, "u_init", property, timezone)
+func (sdk *SDK) Uinit(uid string, property map[string]any, timezone string, customEventTime ...time.Time) {
+	sdk.Log(uid, "u_init", property, timezone, customEventTime...)
 }
-func (sdk *SDK) UinitLtz(uid string, property map[string]any) {
-	sdk.Uinit(uid, property, time.Local.String())
+func (sdk *SDK) UinitLtz(uid string, property map[string]any, customEventTime ...time.Time) {
+	sdk.Uinit(uid, property, time.Local.String(), customEventTime...)
 }
 
 // 用户属性设置
-func (sdk *SDK) Uset(uid string, property map[string]any, timezone string) {
-	sdk.Log(uid, "u_set", property, timezone)
+func (sdk *SDK) Uset(uid string, property map[string]any, timezone string, customEventTime ...time.Time) {
+	sdk.Log(uid, "u_set", property, timezone, customEventTime...)
 }
-func (sdk *SDK) UsetLtz(uid string, property map[string]any) {
-	sdk.Uset(uid, property, time.Local.String())
+func (sdk *SDK) UsetLtz(uid string, property map[string]any, customEventTime ...time.Time) {
+	sdk.Uset(uid, property, time.Local.String(), customEventTime...)
 }
 
 // 用户属性删除
-func (sdk *SDK) Uunset(uid string, property map[string]any, timezone string) {
-	sdk.Log(uid, "u_unset", property, timezone)
+func (sdk *SDK) Uunset(uid string, property map[string]any, timezone string, customEventTime ...time.Time) {
+	sdk.Log(uid, "u_unset", property, timezone, customEventTime...)
 }
-func (sdk *SDK) UunsetLtz(uid string, property map[string]any) {
-	sdk.Uunset(uid, property, time.Local.String())
+func (sdk *SDK) UunsetLtz(uid string, property map[string]any, customEventTime ...time.Time) {
+	sdk.Uunset(uid, property, time.Local.String(), customEventTime...)
 }
 
 // 用户属性自增/减
-func (sdk *SDK) Uinc(uid string, property map[string]any, timezone string) {
-	sdk.Log(uid, "u_inc", property, timezone)
+func (sdk *SDK) Uinc(uid string, property map[string]any, timezone string, customEventTime ...time.Time) {
+	sdk.Log(uid, "u_inc", property, timezone, customEventTime...)
 }
-func (sdk *SDK) UincLtz(uid string, property map[string]any) {
-	sdk.Uinc(uid, property, time.Local.String())
+func (sdk *SDK) UincLtz(uid string, property map[string]any, customEventTime ...time.Time) {
+	sdk.Uinc(uid, property, time.Local.String(), customEventTime...)
 }
 
 // 这个方法只会在内部协程调用
