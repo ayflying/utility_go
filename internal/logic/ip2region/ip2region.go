@@ -72,7 +72,7 @@ func (s *sIp2region) Load() {
 	*/
 
 	// 基于读取的内容，创建查询对象
-	s.searcher, err = xdb.NewWithBuffer(cBuff)
+	s.searcher, err = xdb.NewWithBuffer(xdb.IPv4, cBuff)
 	if err != nil {
 		g.Log().Errorf(ctx, "无法创建内容为的搜索器： %s", err)
 		return
