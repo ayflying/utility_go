@@ -53,6 +53,7 @@ type (
 		// @Description: 保存游戏活动数据
 		// @receiver s *sGameAct: 游戏活动服务结构体指针
 		// @return err error: 返回错误信息
+		// SavesV2 保存游戏活动数据
 		SavesV2() (err error)
 		// SaveV2 保存游戏活动数据
 		//

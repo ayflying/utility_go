@@ -5,6 +5,7 @@
 package logic
 
 import (
+	_ "github.com/ayflying/utility_go/internal/logic/casdoor"
 	_ "github.com/ayflying/utility_go/internal/logic/gameAct"
 	_ "github.com/ayflying/utility_go/internal/logic/gameKv"
 	_ "github.com/ayflying/utility_go/internal/logic/ip2region"
