@@ -5,10 +5,14 @@
 
 package service
 
+import (
+	"github.com/lionsoul2014/ip2region/binding/golang/xdb"
+)
+
 type (
 	IIp2Region interface {
 		//	@receiver s *sIp2region: sIp2region的实例。
-		Load()
+		Load(t *xdb.Version)
 		GetIp(ip string) (res []string)
 	}
 )
