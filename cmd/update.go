@@ -2,15 +2,16 @@ package cmd
 
 import (
 	"context"
+	"os"
+	"path"
+	"time"
+
 	"github.com/ayflying/utility_go/pkg"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gcmd"
 	"github.com/gogf/gf/v2/os/gctx"
-	"os"
-	"path"
-	"time"
 )
 
 type serverCfg struct {
@@ -40,22 +41,6 @@ var (
 			//获取文件名
 			getFileName, err := g.Cfg("hack").Get(ctx, "gfcli.build.name")
 			Filename := getFileName.String()
-
-			////获取架构
-			//getArch, err := g.Cfg("hack").Get(ctx, "gfcli.build.arch")
-			//Arch := getArch.String()
-			//if Arch == "" {
-			//	Arch = "amd64"
-			//}
-			//
-			////获取操作系统
-			//getSystem, err := g.Cfg("hack").Get(ctx, "gfcli.build.system")
-			//System := getSystem.String()
-			//
-			//if System == "" {
-			//	System = "linux"
-			//}
-			//var systemName = System + "_" + Arch
 
 			//获取版本号
 			getVersion, err := g.Cfg("hack").Get(ctx, "gfcli.build.version")
