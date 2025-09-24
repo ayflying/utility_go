@@ -1,8 +1,9 @@
 package tools
 
 import (
-	"github.com/gogf/gf/v2/os/gtime"
 	"time"
+
+	"github.com/gogf/gf/v2/os/gtime"
 )
 
 type timeMod struct {
@@ -127,4 +128,27 @@ func (m *timeMod) ExcelTime2Time(excelTime string) time.Time {
 	layout := "1/2/06 15:04" // 月/日/年(最后两位) 小时:分钟 (24小时制)
 	timeNew, _ := time.ParseInLocation(layout, excelTime, time.Local)
 	return timeNew
+}
+
+// 指定时刻刷新
+// 判断当前是否可领取
+// createdTime 刷新时刻
+// lastRwdTime 上次领取时间
+// now 当前时间
+func (m *timeMod) CheckIsBeRwd(createdTime, lastRwdTime time.Time, _now ...time.Time) bool {
+	now := time.Now()
+	if len(_now) > 0 {
+		now = _now[0]
+	}
+	//今天的刷新时间
+	refreshToday := time.Date(now.Year(), now.Month(), now.Day(),
+		createdTime.Hour(), createdTime.Minute(), createdTime.Second(),
+		0, createdTime.Location())
+	// 如果今天还没到刷新时间，则刷新时间应是昨天
+	if now.Before(refreshToday) {
+		refreshToday = refreshToday.AddDate(0, 0, -1)
+	}
+	// 判断上次领取时间是否在刷新时间之前
+	// 如果是，则说明还没领过，可以领取
+	return lastRwdTime.Before(refreshToday)
 }
