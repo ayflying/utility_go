@@ -18,8 +18,9 @@ import (
 )
 
 type sendBody struct {
-	Pid  string  `json:"pid"`
-	Data [][]any `json:"data"`
+	Pid      string  `json:"pid"`
+	Data     [][]any `json:"data"`
+	SaveType int     `json:"save_type" dc:"0=文件存储, 1=kafka存储"`
 }
 
 // todo 游戏日志对象
@@ -41,7 +42,8 @@ type SDKConfig struct {
 	RetryN        int    // 每N次重试
 	ChanSize      int    // 信道大小, 默认1000
 
-	reportN int
+	reportN      int
+	SendSaveType int // 发送存储类型, 默认不设置为0代表文件存储, 1代表走kafka可实同步日志
 }
 
 type SDK struct {
@@ -379,8 +381,9 @@ func (sdk *SDK) send(logs []GameLog) {
 	}
 	// json化
 	sbody := sendBody{
-		Pid:  sdk.sdkConfig.Pid,
-		Data: data,
+		Pid:      sdk.sdkConfig.Pid,
+		Data:     data,
+		SaveType: sdk.sdkConfig.SendSaveType,
 	}
 	jsonBody, err := json.Marshal(sbody)
 	if err != nil {
