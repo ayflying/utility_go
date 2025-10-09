@@ -32,7 +32,7 @@ func (sdk *SDK) GetLogItem(uid, event string, property map[string]any, timezone 
 	item := []any{
 		uid,
 		event,
-		pstr,
+		gconv.String(pstr),
 		et.TimestampMilli(),
 		et.In(loc).Format(datetimeFmt),
 	}
