@@ -24,6 +24,7 @@ func (sdk *SDK) GetLogItem(uid, event string, property map[string]any, timezone 
 	} else {
 		et = gtime.Now()
 	}
+	safeProperty(property)
 	pstr, err := json.Marshal(property)
 	if err != nil {
 		g.Log().Errorf(ctx, "GetLogItem Fail ! json marshal property err: %v", err)

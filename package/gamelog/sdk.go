@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/gogf/gf/v2/net/gclient"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/util/gconv"
 )
 
 type sendBody struct {
@@ -65,6 +67,16 @@ var (
 	locationMap sync.Map // 声明一个线程安全的Map
 
 )
+
+var safePropertyRE = regexp.MustCompile(`["'\\\/]`)
+
+func safeProperty(property map[string]any) {
+	for k, v := range property {
+		if _, ok := v.(string); ok {
+			property[k] = safePropertyRE.ReplaceAllString(gconv.String(v), "*")
+		}
+	}
+}
 
 func getLocationMapValue(key string) *time.Location {
 	// 1. 先尝试读
@@ -278,6 +290,7 @@ func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string,
 	if len(property) == 0 {
 		property = map[string]any{"ts": gtime.Now().Timestamp()}
 	}
+	safeProperty(property)
 	var et *gtime.Time
 	if len(customEventTime) > 0 {
 		et = gtime.NewFromTime(customEventTime[0])
