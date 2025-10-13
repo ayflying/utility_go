@@ -69,9 +69,7 @@ var (
 )
 
 var safePropertyRE = regexp.MustCompile(
-	`["'\\\/]` +
-		`|\\U[0-9a-fA-F]{8}` + // Unicode 8位转义
-		`|\\u[0-9a-fA-F]{4}` + // Unicode 4位转义
+	`["'\\\/\s]` +
 		`|\\[tnrfbv\\]` + // 转义字面量
 		`|[\x00-\x1F\x7F-\x9F]` + // ASCII + C1 控制字符
 		`|[\\u200B-\\u200D\\uFEFF]`, // 零宽字符
