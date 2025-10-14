@@ -68,17 +68,29 @@ var (
 
 )
 
-var safePropertyRE = regexp.MustCompile(
-	`["'\\\/\s]` +
-		`|\\[tnrfbv\\]` + // 转义字面量
-		`|[\x00-\x1F\x7F-\x9F]` + // ASCII + C1 控制字符
-		`|[\\u200B-\\u200D\\uFEFF]`, // 零宽字符
-)
+var safePropertyRE = regexp.MustCompile(`[/"'\\\/]`)
+
+// 设置某些字段只允许包含字母、数字和下划线
+var onlyWordRE = regexp.MustCompile(`\W`)
+var onlyWordPropertyNames = map[string]struct{}{
+	"nickname": {},
+}
+
+func SetOnlyWordProperty(propertyNames ...string) {
+	for _, propertyName := range propertyNames {
+		onlyWordPropertyNames[propertyName] = struct{}{}
+	}
+}
 
 func safeProperty(property map[string]any) {
 	for k, v := range property {
-		if _, ok := v.(string); ok {
+		if _, ok := onlyWordPropertyNames[k]; ok {
+			if _, ok := v.(string); ok {
+				property[k] = onlyWordRE.ReplaceAllString(gconv.String(v), "_")
+			}
+		} else {
 			property[k] = safePropertyRE.ReplaceAllString(gconv.String(v), "*")
+
 		}
 	}
 }
