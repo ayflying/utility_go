@@ -86,7 +86,7 @@ func safeProperty(property map[string]any) {
 	for k, v := range property {
 		if _, ok := onlyWordPropertyNames[k]; ok {
 			if _, ok := v.(string); ok {
-				property[k] = onlyWordRE.ReplaceAllString(gconv.String(v), "_")
+				property[k] = onlyWordRE.ReplaceAllString(gconv.String(v), "*")
 			}
 		} else {
 			property[k] = safePropertyRE.ReplaceAllString(gconv.String(v), "*")
