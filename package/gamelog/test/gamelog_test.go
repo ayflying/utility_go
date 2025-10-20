@@ -23,7 +23,7 @@ func TestGamelog(t *testing.T) {
 		// 可填
 		RetryN:       2,   // 默认每10次, 上传检查一次磁盘的失败数据
 		ChanSize:     500, // 默认1000, 信道size
-		SendSaveType: 1,   // 发送存储类型, 默认不设置为0代表文件存储, 1代表走kafka可实同步日志
+		SendSaveType: 1,   // 发送存储类型, 默认不设置为0代表文件存储, 2代表走kafka可实同步日志
 	})
 
 	// 随机测试事件和属性
