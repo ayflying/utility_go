@@ -10,6 +10,7 @@ import (
 	_ "github.com/ayflying/utility_go/internal/logic/gameKv"
 	_ "github.com/ayflying/utility_go/internal/logic/ip2region"
 	_ "github.com/ayflying/utility_go/internal/logic/logData"
+	_ "github.com/ayflying/utility_go/internal/logic/os"
 	_ "github.com/ayflying/utility_go/internal/logic/systemCron"
 	_ "github.com/ayflying/utility_go/internal/logic/systemLog"
 )

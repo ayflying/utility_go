@@ -42,6 +42,9 @@ var (
 			getFileName, err := g.Cfg("hack").Get(ctx, "gfcli.build.name")
 			Filename := getFileName.String()
 
+			getPath, err := g.Cfg("hack").Get(ctx, "gfcli.build.path")
+			Path := getPath.String()
+
 			//获取版本号
 			getVersion, err := g.Cfg("hack").Get(ctx, "gfcli.build.version")
 			Version := getVersion.String()
@@ -89,7 +92,7 @@ var (
 					if v.Arch != "" && v.System != "" {
 						systemName = v.System + "_" + v.Arch
 					}
-					var filename = path.Join(Version, systemName, Filename)
+					var filename = path.Join(Path, Version, systemName, Filename)
 					g.Log().Debugf(ctx, "当前上传文件："+filename)
 
 					url[v.S3], err = UploadS3(v.S3, filename)
