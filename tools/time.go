@@ -152,3 +152,8 @@ func (m *timeMod) CheckIsBeRwd(createdTime, lastRwdTime time.Time, _now ...time.
 	// 如果是，则说明还没领过，可以领取
 	return lastRwdTime.Before(refreshToday)
 }
+
+// 获取指定时间的本月最后一刻
+func (m *timeMod) EndOfMonth(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month()+1, 1, 0, 0, 0, 0, t.Location()).Add(-time.Second)
+}
