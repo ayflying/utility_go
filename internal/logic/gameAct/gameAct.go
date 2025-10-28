@@ -15,6 +15,7 @@ import (
 	service2 "github.com/ayflying/utility_go/service"
 	"github.com/ayflying/utility_go/tools"
 	"github.com/gogf/gf/v2/container/gset"
+	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
@@ -68,8 +69,8 @@ func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
 		Uid:   uid,
 		ActId: actId,
 	}).Fields("action").OrderDesc("updated_at").Value()
-	getDb.Scan(&data)
-
+	// getDb.Scan(&data)
+	data = gvar.New(getDb)
 	if data == nil || data.IsEmpty() {
 		return
 	}
