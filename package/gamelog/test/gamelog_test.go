@@ -14,8 +14,9 @@ import (
 func TestGamelog(t *testing.T) {
 	glsdk, err := gamelog.INIT(&gamelog.SDKConfig{
 		// 必填
-		Pid:     "test5",                     // 项目ID
-		BaseUrl: "http://47.76.178.47:10101", // 香港测试服上报地址
+		Pid: "test5", // 项目ID
+		// BaseUrl: "http://47.76.178.47:10101", // 香港测试服上报地址
+		BaseUrl: "http://101.37.28.111:10101", // 香港测试服上报地址
 		// BaseUrl:       "http://127.0.0.1:10101", // 本次测试上报地址
 		ReportSk:      "sngame2025", // xor混淆key
 		FlushInterval: 5,            // 上报间隔

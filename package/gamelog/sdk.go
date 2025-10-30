@@ -390,7 +390,7 @@ func (sdk *SDK) flush() {
 
 // 发送消息
 func (sdk *SDK) send(logs []GameLog) {
-	waitSecond := time.Duration(sdk.sdkConfig.FlushInterval/4) * time.Second
+	waitSecond := time.Duration(sdk.sdkConfig.FlushInterval/4)*time.Second + time.Second*time.Duration(gconv.Int(len(logs)/5000))
 	timeoutCtx, cancel := context.WithTimeout(context.Background(), waitSecond)
 	defer cancel()
 	data := make([][]any, 0, len(logs))
