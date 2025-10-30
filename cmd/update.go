@@ -112,9 +112,24 @@ var (
 					FileUrl: url[v.S3],
 				})
 				if err != nil {
-					Proxy := g.Cfg().MustGet(ctx, "update_proxy", "http://192.168.50.170:10808").String()
-					g.Log().Debugf(ctx, "切换代理进行上传:err=%v", err)
-					get, err = client.Proxy(Proxy).Post(ctx, address+"/callback/update", &UpdateReq{
+					// 读取HTTP代理环境变量（小写/大写通常都兼容，部分系统可能用大写）
+					httpProxy := os.Getenv("http_proxy")
+					if httpProxy == "" {
+						httpProxy = os.Getenv("HTTP_PROXY")
+					}
+					if httpProxy == "" {
+						// 读取HTTPS代理环境变量
+						httpProxy = os.Getenv("https_proxy")
+						if httpProxy == "" {
+							httpProxy = os.Getenv("HTTPS_PROXY")
+						}
+					}
+					// 如果没有读取到本地的代理，使用配置上传
+					if httpProxy == "" {
+						httpProxy = g.Cfg().MustGet(ctx, "update_proxy", "http://192.168.50.173:10808").String()
+					}
+					g.Log().Debugf(ctx, "切换代理进行上传:ip=%v,err=%v", httpProxy, err)
+					get, err = client.Proxy(httpProxy).Post(ctx, address+"/callback/update", &UpdateReq{
 						FileUrl: url[v.S3],
 					})
 				}
