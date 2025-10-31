@@ -72,6 +72,13 @@ var safePropertyRE = regexp.MustCompile(`[/"'\\\/]`)
 
 // 设置某些字段只允许包含字母、数字和下划线
 var onlyWordRE = regexp.MustCompile(`\W`)
+var nonWordCharRes = regexp.MustCompile(`[^\w]`)
+
+func hasNonWordChar(s string) bool {
+	// 匹配非 \w 字符的正则表达式
+	return nonWordCharRes.MatchString(s)
+}
+
 var onlyWordPropertyNames = map[string]struct{}{
 	"nickname": {},
 }
@@ -83,7 +90,12 @@ func SetOnlyWordProperty(propertyNames ...string) {
 }
 
 func safeProperty(property map[string]any) {
+	delkeys := []string{}
 	for k, v := range property {
+		if hasNonWordChar(k) {
+			delkeys = append(delkeys, k)
+			continue
+		}
 		if _, ok := onlyWordPropertyNames[k]; ok {
 			if _, ok := v.(string); ok {
 				property[k] = onlyWordRE.ReplaceAllString(gconv.String(v), "*")
@@ -92,6 +104,9 @@ func safeProperty(property map[string]any) {
 			property[k] = safePropertyRE.ReplaceAllString(gconv.String(v), "*")
 
 		}
+	}
+	for _, delkey := range delkeys {
+		delete(property, delkey)
 	}
 }
 
