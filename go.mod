@@ -12,8 +12,8 @@ require (
 	github.com/go-pay/gopay v1.5.114
 	github.com/go-pay/util v0.0.4
 	github.com/goccy/go-json v0.10.5
-	github.com/gogf/gf/contrib/config/apollo/v2 v2.9.3
-	github.com/gogf/gf/v2 v2.9.3
+	github.com/gogf/gf/contrib/config/apollo/v2 v2.9.4
+	github.com/gogf/gf/v2 v2.9.4
 	github.com/google/uuid v1.6.0
 	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20250916043522-9a14e3273609
 	github.com/minio/minio-go/v7 v7.0.95
@@ -72,7 +72,7 @@ require (
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.1.0 // indirect
 	github.com/olekukonko/ll v0.1.1 // indirect
-	github.com/olekukonko/tablewriter v1.0.9 // indirect
+	github.com/olekukonko/tablewriter v1.1.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect

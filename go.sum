@@ -151,10 +151,10 @@ github.com/go-viper/mapstructure/v2 v2.4.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlnd
 github.com/goccy/go-json v0.10.5 h1:Fq85nIqj+gXn/S5ahsiTlK3TmC85qgirsdTP/+DeaC4=
 github.com/goccy/go-json v0.10.5/go.mod h1:oq7eo15ShAhp70Anwd5lgX2pLfOS3QCiwU/PULtXL6M=
 github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
-github.com/gogf/gf/contrib/config/apollo/v2 v2.9.3 h1:/IcE+DmlQDWeDjnkKWr1Rql7VCLUxEqz7gXoQKZHd8o=
-github.com/gogf/gf/contrib/config/apollo/v2 v2.9.3/go.mod h1:mek4CnNsvdum4jYhf0PzaIYzoSBuSvVXyuCZG4I9qvw=
-github.com/gogf/gf/v2 v2.9.3 h1:qjN4s55FfUzxZ1AE8vUHNDX3V0eIOUGXhF2DjRTVZQ4=
-github.com/gogf/gf/v2 v2.9.3/go.mod h1:w6rcfD13SmO7FKI80k9LSLiSMGqpMYp50Nfkrrc2sEE=
+github.com/gogf/gf/contrib/config/apollo/v2 v2.9.4 h1:l2vkPpqteotzpq0h5Qg6S/GK84WpPUZlRwPVfZSDbYs=
+github.com/gogf/gf/contrib/config/apollo/v2 v2.9.4/go.mod h1:mTfSf2Zm8+C49+rM7pK6AC8cwDSDxxwO8sLMNOl0yCI=
+github.com/gogf/gf/v2 v2.9.4 h1:6vleEWypot9WBPncP2GjbpgAUeG6Mzb1YESb9nPMkjY=
+github.com/gogf/gf/v2 v2.9.4/go.mod h1:Ukl+5HUH9S7puBmNLR4L1zUqeRwi0nrW4OigOknEztU=
 github.com/gogo/protobuf v1.3.2/go.mod h1:P1XiOD3dCwIKUDQYPy72D8LYyHL2YPYrpS2s69NZV8Q=
 github.com/golang-jwt/jwt/v4 v4.5.2 h1:YtQM7lnr8iZ+j5q71MGKkNw9Mn7AjHM68uc9g5fXeUI=
 github.com/golang-jwt/jwt/v4 v4.5.2/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
@@ -321,8 +321,8 @@ github.com/olekukonko/errors v1.1.0 h1:RNuGIh15QdDenh+hNvKrJkmxxjV4hcS50Db478Ou5
 github.com/olekukonko/errors v1.1.0/go.mod h1:ppzxA5jBKcO1vIpCXQ9ZqgDh8iwODz6OXIGKU8r5m4Y=
 github.com/olekukonko/ll v0.1.1 h1:9Dfeed5/Mgaxb9lHRAftLK9pVfYETvHn+If6lywVhJc=
 github.com/olekukonko/ll v0.1.1/go.mod h1:2dJo+hYZcJMLMbKwHEWvxCUbAOLc/CXWS9noET22Mdo=
-github.com/olekukonko/tablewriter v1.0.9 h1:XGwRsYLC2bY7bNd93Dk51bcPZksWZmLYuaTHR0FqfL8=
-github.com/olekukonko/tablewriter v1.0.9/go.mod h1:5c+EBPeSqvXnLLgkm9isDdzR3wjfBkHR9Nhfp3NWrzo=
+github.com/olekukonko/tablewriter v1.1.0 h1:N0LHrshF4T39KvI96fn6GT8HEjXRXYNDrDjKFDB7RIY=
+github.com/olekukonko/tablewriter v1.1.0/go.mod h1:5c+EBPeSqvXnLLgkm9isDdzR3wjfBkHR9Nhfp3NWrzo=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pascaldekloe/goe v0.0.0-20180627143212-57f6aae5913c/go.mod h1:lzWF7FIEvWOWxwDKqyGYQf6ZUaNfKdP144TG7ZOy1lc=
