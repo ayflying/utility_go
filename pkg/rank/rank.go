@@ -2,8 +2,9 @@ package rank
 
 import (
 	"fmt"
-	v1 "github.com/ayflying/utility_go/api/pkg/v1"
 	"time"
+
+	v1 "github.com/ayflying/utility_go/api/pkg/v1"
 
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
@@ -94,6 +95,51 @@ func (r *F64CountRank) IncrScore(id int64, score int64) (curScore float64, err e
 	if curScore <= 0 {
 		err = r.DelScore(id)
 	}
+
+	return
+}
+
+// SetScore 对指定ID的分数进行赋值,这样同分情况下先完成的在前面。
+// 该方法首先更新成员的更新时间戳，然后更新成员的分数。
+//
+// 参数:
+//
+//	id - 要操作的成员ID。
+//	score - 要更新的分数。
+//
+// 返回值:
+//
+//	err - 操作过程中可能发生的错误。
+//
+//	@Description:
+//	@receiver r
+//	@param id
+//	@param score
+//	@return err
+func (r *F64CountRank) SetScore(id int64, score int) (err error) {
+	// 记录当前时间戳，用于更新成员的最新活动时间。
+	now := time.Now().UnixMilli()
+
+	// 将成员的更新时间戳加入到Redis的有序集合中，确保成员的排序依据是最新的活动时间。
+	_, err = g.Redis().ZAdd(ctx, r.updateTs, &gredis.ZAddOption{}, gredis.ZAddMember{
+		Score:  float64(now),
+		Member: id,
+	})
+	if err != nil {
+		return
+	}
+	//如果分数小于0，则删除
+	if score <= 0 {
+		err = r.DelScore(id)
+		if err != nil {
+			return
+		}
+	}
+	// 增加成员的分数，并返回增加后的当前分数。
+	_, err = g.Redis().ZAdd(ctx, r.name, &gredis.ZAddOption{}, gredis.ZAddMember{
+		Score:  float64(score) + (3*1e13 - float64(now)) / 1e14,
+		Member: id,
+	})
 
 	return
 }
