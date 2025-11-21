@@ -117,9 +117,17 @@ func (r *F64CountRank) IncrScore(id int64, score int64) (curScore float64, err e
 //	@param score
 //	@return err
 func (r *F64CountRank) SetScore(id int64, score int) (err error) {
+	//如果分数小于0，则删除
+	if score <= 0 {
+		err = r.DelScore(id)
+		if err != nil {
+			return
+		}
+		return
+	}
 	// 记录当前时间戳，用于更新成员的最新活动时间。
 	now := time.Now().UnixMilli()
-
+	
 	// 将成员的更新时间戳加入到Redis的有序集合中，确保成员的排序依据是最新的活动时间。
 	_, err = g.Redis().ZAdd(ctx, r.updateTs, &gredis.ZAddOption{}, gredis.ZAddMember{
 		Score:  float64(now),
@@ -128,16 +136,10 @@ func (r *F64CountRank) SetScore(id int64, score int) (err error) {
 	if err != nil {
 		return
 	}
-	//如果分数小于0，则删除
-	if score <= 0 {
-		err = r.DelScore(id)
-		if err != nil {
-			return
-		}
-	}
-	// 增加成员的分数，并返回增加后的当前分数。
+
+	// 覆盖成员的分数
 	_, err = g.Redis().ZAdd(ctx, r.name, &gredis.ZAddOption{}, gredis.ZAddMember{
-		Score:  float64(score) + (3*1e13 - float64(now)) / 1e14,
+		Score:  float64(score) + (3*1e13-float64(now))/1e14,
 		Member: id,
 	})
 
@@ -184,6 +186,35 @@ func (r *F64CountRank) DelScore(id int64) (err error) {
 	_, err = g.Redis().ZRem(ctx, r.updateTs, id)
 	// 从排名集合中移除id
 	_, err = g.Redis().ZRem(ctx, r.name, id)
+	return
+}
+
+// DelByStopRank 删除指定名次后的元素
+func (r *F64CountRank) DelByStopRank(stop int64) (err error) {
+	// 初始化一个空的int64切片，用于存储指定排名范围内的元素。
+	var members []int64
+
+	// 使用Redis的ZRange命令获取指定排名范围内的元素。
+	// 选项Rev设置为true，表示按照分数从高到低的顺序返回元素。
+	get, err := g.Redis().ZRange(ctx, r.name, stop, 9999999,
+		gredis.ZRangeOption{
+			Rev: true,
+		})
+
+	// 使用Scan方法将获取到的元素扫描到members切片中。
+	err = get.Scan(&members)
+	// 如果扫描过程中出现错误，直接返回错误。
+	if err != nil {
+		return
+	}
+
+	// 遍历members切片，对于每个元素，使用ZRem命令从更新时间集合中删除对应的成员。
+	for _, member := range members {
+		_, err = g.Redis().ZRem(ctx, r.updateTs, member)
+		// 忽略ZRem操作的错误，因为即使元素不存在，ZRem也不会返回错误。
+	}
+	//删除超过9999的数据
+	g.Redis().ZRemRangeByRank(ctx, r.name, 0, -(stop + 1))
 	return
 }
 
