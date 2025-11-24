@@ -77,7 +77,7 @@ func (s *sGameAct) Info(uid int64, actId int) (data *g.Var, err error) {
 	_, err = g.Redis().Set(ctx, keyCache, data)
 
 	var CacheKey = fmt.Sprintf("act:update:%d", uid)
-	pkg.Cache("redis").Set(ctx, CacheKey, uid, time.Hour*24*1)
+	pkg.Cache("redis").Set(ctx, CacheKey, uid, time.Hour*24*3)
 
 	return
 }
