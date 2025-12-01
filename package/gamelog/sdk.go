@@ -100,9 +100,6 @@ func safeProperty(property map[string]any) {
 			if _, ok := v.(string); ok {
 				property[k] = onlyWordRE.ReplaceAllString(gconv.String(v), "*")
 			}
-		} else {
-			property[k] = safePropertyRE.ReplaceAllString(gconv.String(v), "*")
-
 		}
 	}
 	for _, delkey := range delkeys {
