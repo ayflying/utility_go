@@ -237,7 +237,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				}
 
 				//删除缓存
-				//s.DelCacheKey(ctx, v.ActId, v.Uid)
+				s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 				updateCount++
 				update = make([]*entity.GameAct, 0)
@@ -458,10 +458,10 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 				tx, err = g.DB().Begin(ctx)
 			}
 			//删除缓存
-			//s.DelCacheKey(ctx, v.ActId, v.Uid)
+			s.DelCacheKey(ctx, v.ActId, v.Uid)
 		}
 		//循环结束了，最后写入一波
-		g.Log().Debugf(ctx, "act当前更新数据库: %v 条", updateCount)
+		g.Log().Debugf(ctx, "Cache2Sql运行结束，act当前更新数据库: %v 条", updateCount)
 		update = (update)[:0]
 	}
 
@@ -479,7 +479,7 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 			}
 			addCount++
 			if addCount > TaskMax {
-				g.Log().Debugf(ctx, "act当前写入数据库: %v 条", addCount)
+				g.Log().Debugf(ctx, "超过%v条，act当前写入数据库: %v 条", TaskMax, addCount)
 				err = tx.Commit()
 				if err != nil {
 					g.Log().Debugf(ctx, "act当前写入数据库失败:%v", err)
@@ -489,11 +489,11 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 				tx, err = g.DB().Begin(ctx)
 			}
 			//删除缓存
-			//s.DelCacheKey(ctx, v.ActId, v.Uid)
+			s.DelCacheKey(ctx, v.ActId, v.Uid)
 		}
 
 		//循环结束了，最后写入一波
-		g.Log().Debugf(ctx, "act当前写入数据库: %v 条", addCount)
+		g.Log().Debugf(ctx, "Cache2Sql运行结束，act当前写入数据库: %v 条", addCount)
 		add = (add)[:0]
 	}
 
@@ -545,7 +545,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			addCount += row
 
 			if addCount > TaskMax {
-				g.Log().Debugf(ctx, "act当前写入数据库: %v 条", addCount)
+				g.Log().Debugf(ctx, "超过%v条，act当前写入数据库: %v 条", TaskMax, addCount)
 				err = tx.Commit()
 				if err != nil {
 					g.Log().Debugf(ctx, "act当前写入数据库失败:%v", err)
@@ -556,7 +556,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			}
 
 			//删除缓存
-			//s.DelCacheKey(ctx, v.ActId, v.Uid)
+			s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 		case v, ok := <-updateChan:
 			if !ok {
@@ -579,10 +579,10 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			updateCount++
 
 			if updateCount > TaskMax {
-				g.Log().Debugf(ctx, "act当前写入数据库: %v 条", addCount)
+				g.Log().Debugf(ctx, "超过%v条，act当前更新数据库: %v 条", TaskMax, updateCount)
 				err = tx.Commit()
 				if err != nil {
-					g.Log().Debugf(ctx, "act当前写入数据库失败:%v", err)
+					g.Log().Debugf(ctx, "act当前更新数据库失败:%v", err)
 					return
 				}
 				updateCount = 0
@@ -590,7 +590,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			}
 
 			//删除缓存
-			//s.DelCacheKey(ctx, v.ActId, v.Uid)
+			s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 		case <-ctx.Done():
 			g.Log().Debug(ctx, "act协程被上下文取消")
@@ -600,8 +600,8 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 
 	err = tx.Commit()
 	// 仅在所有通道处理完毕后打印最终计数（移除中间冗余日志）
-	g.Log().Debugf(ctx, "act当前写入数据库: %v 条", addCount)
-	g.Log().Debugf(ctx, "act当前更新数据库: %v 条", updateCount)
+	g.Log().Debugf(ctx, "运行结束act当前写入数据库: %v 条", addCount)
+	g.Log().Debugf(ctx, "运行结束act当前更新数据库: %v 条", updateCount)
 	return
 }
 
