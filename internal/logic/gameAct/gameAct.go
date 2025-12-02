@@ -237,7 +237,7 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				}
 
 				//删除缓存
-				go s.DelCacheKey(ctx, v.ActId, v.Uid)
+				//s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 				updateCount++
 				update = make([]*entity.GameAct, 0)
@@ -265,10 +265,10 @@ func (s *sGameAct) Save(ctx context.Context, actId int) (err error) {
 				return
 			}
 
-			for _, v2 := range add {
-				//删除缓存
-				go s.DelCacheKey(ctx, v2.ActId, v2.Uid)
-			}
+			//for _, v2 := range add {
+			//	//删除缓存
+			//	s.DelCacheKey(ctx, v2.ActId, v2.Uid)
+			//}
 
 			//g.Log().Debugf(ctx, "当前 %v 写入数据库: %v 条", actId, count)
 			add = make([]*entity.GameAct, 0)
@@ -458,7 +458,7 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 				tx, err = g.DB().Begin(ctx)
 			}
 			//删除缓存
-			s.DelCacheKey(ctx, v.ActId, v.Uid)
+			//s.DelCacheKey(ctx, v.ActId, v.Uid)
 		}
 		//循环结束了，最后写入一波
 		g.Log().Debugf(ctx, "act当前更新数据库: %v 条", updateCount)
@@ -489,7 +489,7 @@ func (s *sGameAct) Cache2Sql(ctx context.Context, add, update []*entity.GameAct)
 				tx, err = g.DB().Begin(ctx)
 			}
 			//删除缓存
-			s.DelCacheKey(ctx, v.ActId, v.Uid)
+			//s.DelCacheKey(ctx, v.ActId, v.Uid)
 		}
 
 		//循环结束了，最后写入一波
@@ -556,7 +556,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			}
 
 			//删除缓存
-			s.DelCacheKey(ctx, v.ActId, v.Uid)
+			//s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 		case v, ok := <-updateChan:
 			if !ok {
@@ -590,7 +590,7 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			}
 
 			//删除缓存
-			s.DelCacheKey(ctx, v.ActId, v.Uid)
+			//s.DelCacheKey(ctx, v.ActId, v.Uid)
 
 		case <-ctx.Done():
 			g.Log().Debug(ctx, "act协程被上下文取消")
@@ -607,17 +607,19 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 
 // 删除缓存key
 func (s *sGameAct) DelCacheKey(ctx context.Context, aid int, uid int64) {
-	//如果有活跃，跳过删除
-	if getBool, _ := pkg.Cache("redis").
-		Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
-		return
-	}
+	go func() {
+		//如果有活跃，跳过删除
+		if getBool, _ := pkg.Cache("redis").
+			Contains(ctx, fmt.Sprintf("act:update:%d", uid)); getBool {
+			return
+		}
 
-	cacheKey := fmt.Sprintf("act:%v:%v", aid, uid)
-	_, err := g.Redis().Del(ctx, cacheKey)
-	if err != nil {
-		g.Log().Error(ctx, err)
-	}
+		cacheKey := fmt.Sprintf("act:%v:%v", aid, uid)
+		_, err := g.Redis().Del(ctx, cacheKey)
+		if err != nil {
+			g.Log().Error(ctx, err)
+		}
+	}()
 }
 
 // 清空GetRedDot缓存
