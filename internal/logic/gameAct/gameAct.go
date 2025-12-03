@@ -510,6 +510,8 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 	//通道关闭标志
 	addClosed := false
 	updateClosed := false
+	//写入总数
+	var addAllCount, updateAllCount int64
 
 	tx, err := g.DB().Begin(ctx)
 	if err != nil {
@@ -545,12 +547,14 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			addCount += row
 
 			if addCount > TaskMax {
-				g.Log().Debugf(ctx, "超过%v条，act当前写入数据库: %v 条", TaskMax, addCount)
+				// g.Log().Debugf(ctx, "超过%v条，act当前写入数据库: %v 条", TaskMax, addCount)
 				err = tx.Commit()
 				if err != nil {
 					g.Log().Debugf(ctx, "act当前写入数据库失败:%v", err)
 					return
 				}
+				//清空数量前累加一下
+				addAllCount += addCount
 				addCount = 0
 				tx, err = g.DB().Begin(ctx)
 			}
@@ -579,12 +583,14 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 			updateCount++
 
 			if updateCount > TaskMax {
-				g.Log().Debugf(ctx, "超过%v条，act当前更新数据库: %v 条", TaskMax, updateCount)
+				// g.Log().Debugf(ctx, "超过%v条，act当前更新数据库: %v 条", TaskMax, updateCount)
 				err = tx.Commit()
 				if err != nil {
 					g.Log().Debugf(ctx, "act当前更新数据库失败:%v", err)
 					return
 				}
+				//清空数量前累加一下
+				updateAllCount += updateCount
 				updateCount = 0
 				tx, err = g.DB().Begin(ctx)
 			}
@@ -600,8 +606,8 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 
 	err = tx.Commit()
 	// 仅在所有通道处理完毕后打印最终计数（移除中间冗余日志）
-	g.Log().Debugf(ctx, "运行结束act当前写入数据库: %v 条", addCount)
-	g.Log().Debugf(ctx, "运行结束act当前更新数据库: %v 条", updateCount)
+	g.Log().Debugf(ctx, "运行结束act当前写入数据库: %v 条", addAllCount)
+	g.Log().Debugf(ctx, "运行结束act当前更新数据库: %v 条", updateAllCount)
 	return
 }
 
