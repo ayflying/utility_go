@@ -605,6 +605,8 @@ func (s *sGameAct) Cache2SqlChan(ctx context.Context, addChan, updateChan chan *
 	}
 
 	err = tx.Commit()
+	addAllCount += addCount
+	updateAllCount += updateCount
 	// 仅在所有通道处理完毕后打印最终计数（移除中间冗余日志）
 	g.Log().Debugf(ctx, "运行结束act当前写入数据库: %v 条", addAllCount)
 	g.Log().Debugf(ctx, "运行结束act当前更新数据库: %v 条", updateAllCount)
