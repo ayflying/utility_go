@@ -26,7 +26,7 @@ var (
 	Name       = "game_act"
 	ActList    = gset.New(true)
 	RunTimeMax *gtime.Time
-	TaskMax    int64 = 5
+	TaskMax    int64 = 100
 )
 
 type sGameAct struct {
