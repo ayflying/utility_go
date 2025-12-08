@@ -12,4 +12,5 @@ import (
 
 type ICallbackV1 interface {
 	Ip(ctx context.Context, req *v1.IpReq) (res *v1.IpRes, err error)
+	Robots(ctx context.Context, req *v1.RobotsReq) (res *v1.RobotsRes, err error)
 }
