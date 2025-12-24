@@ -1,78 +1,309 @@
-# utility_go：强大的Go语言工具类库
+# utility_go
 
-## 一、项目概述
-`utility_go` 是一个功能丰富的Go语言工具类库，旨在助力开发者更高效地开发Go应用程序。它提供了一系列实用的功能模块，广泛涵盖数据库操作、缓存处理、支付接口集成、排名算法实现等多个方面，适用于各类Go项目。
+[![Go Version](https://img.shields.io/badge/Go-1.24+-blue.svg)](https://golang.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ayflying/utility_go.svg)](https://github.com/ayflying/utility_go/stargazers)
 
-## 二、安装方式
-要使用 `utility_go` 工具类库，可使用 `go get` 命令进行安装。请确保你的Go环境已正确配置，且可访问互联网。
+一个功能丰富的Go语言工具类库，提供支付集成、缓存管理、排名算法、数据库操作、系统管理等核心功能模块，适用于各类Go项目开发。
 
-### 安装命令
-```sh
+## ✨ 核心特性
+
+- **🔧 多模块集成**: 支付、缓存、排名、数据库、系统管理等完整解决方案
+- **⚡ 高性能**: 基于Redis的高性能排名算法和缓存管理
+- **📱 支付支持**: 集成Apple Pay、Google Play Store、支付宝、微信支付等主流支付平台
+- **🛠️ CLI工具**: 提供代码生成器，快速创建模块文件
+- **📊 监控告警**: 集成Prometheus监控和系统日志管理
+- **🌐 多存储支持**: 支持S3对象存储、Elasticsearch搜索引擎
+
+## 📦 安装
+
+```bash
 go get github.com/ayflying/utility_go
 ```
 
-### 安装验证
-安装完成后，你可以在Go代码中导入 `utility_go` 相关的包，检查是否能够正常使用。示例如下：
+## 🏗️ 项目结构
+
+```
+utility_go/
+├── api/                    # API接口定义
+│   ├── admin/             # 管理后台API
+│   ├── callback/          # 回调接口
+│   ├── system/            # 系统API
+│   └── pkg/               # 包相关API
+├── cmd/                   # CLI命令工具
+│   ├── make.go            # 代码生成器
+│   ├── load.go            # 配置加载
+│   ├── update.go          # 更新工具
+│   └── middleware.go      # 中间件工具
+├── controller/            # 控制器层
+│   └── callback/          # 回调控制器
+├── service/               # 服务层
+│   ├── casdoor.go         # 认证服务
+│   ├── game_act.go        # 游戏活动服务
+│   ├── game_kv.go         # 键值存储服务
+│   ├── ip_2_region.go     # IP地理位置服务
+│   ├── log_data.go        # 日志数据服务
+│   ├── os.go              # 操作系统服务
+│   ├── system_cron.go     # 定时任务服务
+│   └── system_log.go      # 系统日志服务
+├── internal/              # 内部核心逻辑
+│   ├── boot/              # 启动初始化
+│   ├── game/              # 游戏逻辑
+│   ├── logic/             # 业务逻辑
+│   │   ├── casdoor/       # 认证逻辑
+│   │   ├── gameAct/       # 游戏活动
+│   │   ├── gameKv/        # 游戏键值存储
+│   │   ├── ip2region/     # IP区域查询
+│   │   ├── logData/       # 日志处理
+│   │   ├── os/            # 系统操作
+│   │   ├── systemCron/    # 定时任务
+│   │   └── systemLog/     # 系统日志
+│   └── model/             # 数据模型
+│       ├── do/            # 数据对象
+│       └── entity/        # 实体定义
+├── package/               # 功能包
+│   ├── aycache/           # 缓存管理
+│   ├── excel/             # Excel处理
+│   ├── gamelog/           # 游戏日志
+│   ├── pay/               # 支付集成
+│   │   ├── alipay/        # 支付宝
+│   │   ├── apple/         # Apple Pay
+│   │   ├── google/        # Google Play
+│   │   ├── wechat/        # 微信支付
+│   │   ├── playstore/     # Play Store
+│   │   └── ...            # 其他支付平台
+│   ├── rank/              # 排名算法
+│   └── s3/                # S3存储
+├── pkg/                   # 公共包
+│   ├── aycache/           # 缓存包
+│   ├── config/            # 配置包
+│   ├── elasticsearch/     # ES包
+│   ├── notice/            # 通知包
+│   ├── rank/              # 排名包
+│   └── s3/                # S3包
+├── tools/                 # 工具函数
+│   ├── random.go          # 随机数
+│   ├── redis.go           # Redis操作
+│   ├── time.go            # 时间处理
+│   └── tools.go           # 通用工具
+├── utility.go             # 主入口
+├── go.mod                 # 模块定义
+└── README.md              # 说明文档
+```
+
+## 🚀 快速开始
+
+### 1. 初始化项目
+
 ```go
 package main
 
 import (
-    // 这里导入utility_go中的某个具体包，根据实际使用情况调整
-    "github.com/ayflying/utility_go/package/pay/apple"
+    _ "github.com/ayflying/utility_go"
+    "github.com/gogf/gf/v2/frame/g"
 )
 
 func main() {
-    // 进行一些简单的操作，如打印版本信息等
-    // 这里假设apple包有一个Version函数
-    // fmt.Println(apple.Version())
+    g.Log().Info(nil, "项目启动成功")
 }
 ```
 
-## 三、项目结构
-`utility_go` 的项目结构设计清晰，各模块分工明确，便于开发者使用和扩展。以下是项目的主要目录结构及说明：
+### 2. 使用CLI工具生成代码
 
-### 主要目录说明
-- **api/**：存放与API相关的代码，包含不同模块的API接口定义，如 `admin`、`callback`、`system` 等。这些API接口用于处理各种外部请求，是项目与外部系统交互的重要入口。
-- **service/**：服务层代码，包含各种业务逻辑的实现，如 `game_act.go`、`ip_2_region.go` 等。服务层负责处理具体的业务需求，将数据处理和业务逻辑封装在独立的函数或方法中，提高代码的可维护性和复用性。
-- **controller/**：控制器层代码，主要用于处理HTTP请求和响应。控制器接收客户端的请求，调用相应的服务层方法进行处理，并将处理结果返回给客户端。
-- **internal/**：内部包，包含项目的核心业务逻辑，如 `game`、`logic`、`model` 等模块。其中，`model` 模块定义了项目中使用的数据模型，如数据库表对应的结构体；`logic` 模块实现了各种业务逻辑的处理函数。
-- **package/**：包含各种功能包，提供了丰富的工具和功能，具体如下：
-  - **aycache**：缓存相关的功能包，提供了缓存操作的接口和实现，帮助开发者更方便地使用缓存技术，提高应用程序的性能。
-  - **elasticsearch**：Elasticsearch相关的功能包，用于与Elasticsearch搜索引擎进行交互，实现数据的存储、检索和分析等功能。
-  - **excel**：Excel处理相关的功能包，提供了Excel文件的读写操作接口，方便开发者处理Excel文件中的数据。
-  - **pay**：支付相关的功能包，包含了与各种支付平台的接口集成，如 `apple`（苹果支付）、`playstore`（Google Play Store支付）等，支持应用内购买等支付功能。
-  - **rand**：随机数相关的功能包，提供了生成各种随机数的函数，可用于测试、加密等场景。
-  - **rank**：排名相关的功能包，实现了各种排名算法，如基于Redis的排行榜功能，可用于游戏排名、活动排名等场景。
-  - **s3**：S3存储相关的功能包，用于与Amazon S3等云存储服务进行交互，实现文件的上传、下载、删除等操作。
-- **tools/**：工具类代码，包含了一些常用的工具函数，如 `redis.go`（Redis操作相关）、`time.go`（时间处理相关）、`tools.go`（通用工具函数）等，方便开发者在项目中使用。
+```bash
+# 创建活动模块
+go run main.go make -m act -i 1
 
-## 四、主要模块功能
+# 创建逻辑模块
+go run main.go make -m logic -n test
 
-### 4.1 pay/playstore
-该模块主要用于与Google Play Store API交互，处理应用内购买相关的操作，提供以下主要功能：
-- **创建客户端**：通过 `New` 函数创建并返回一个包含访问 `androidpublisher` API所需凭证的HTTP客户端，方便开发者与Google Play Store API进行通信。
-- **使用自定义客户端**：`NewWithClient` 函数允许开发者使用自定义的HTTP客户端创建并返回一个包含访问 `androidpublisher` API所需凭证的HTTP客户端，增加了客户端的灵活性。
-- **验证签名**：`VerifySignature` 函数用于验证应用内购买的签名，确保支付信息的安全性和合法性。
+# 创建配置文件
+go run main.go make -m config -n test
 
-### 4.2 s3
-`s3` 模块主要用于与S3存储服务进行交互，提供文件存储和管理的功能。其中，`ListBuckets` 函数可以列出S3存储桶的信息，方便开发者管理存储桶中的文件。
+# 创建Socket模块
+go run main.go make -m socket -n test
+```
 
-### 4.3 model
-`model` 模块定义了项目中使用的数据模型，这些数据模型通常与数据库表相对应，用于数据的存储和操作。例如：
-- **GameMailMass**：表示游戏邮件群发的数据模型，包含邮件的标题、内容、类型等信息。
-- **GameBag**：表示游戏背包的数据模型，包含用户标识、道具数据、图鉴、手势等信息。
-- **MemberSave**：（根据具体代码中的定义）可能表示用户会员信息的数据模型，用于存储用户的会员相关数据。
+## 📚 核心模块详解
 
-### 4.4 tools
-`tools` 模块提供了一系列通用工具函数，涵盖时间处理、Redis操作、道具数据处理等功能：
-- **时间处理**：`time.go` 文件中的函数可以进行时间计算，如获取本周开始时间、计算两个时间间隔天数等。
-- **Redis操作**：`redis.go` 文件中的函数可以进行Redis的扫描操作，支持批量获取大量数据。
-- **通用工具**：`tools.go` 文件中的函数提供了字符串处理、切片操作、道具数据合并等功能。
+### 🔐 支付模块 (package/pay)
 
-## 五、使用示例
+支持多种支付平台集成：
 
-### 5.1 支付模块示例
-以下是一个使用 `pay/playstore` 模块验证应用内购买签名的示例代码：
+#### Google Play Store
+```go
+import "github.com/ayflying/utility_go/package/pay/playstore"
+
+// 创建客户端
+client, err := playstore.New(jsonKey)
+
+// 验证签名
+isValid, err := playstore.VerifySignature(publicKey, receipt, signature)
+```
+
+#### Apple Pay
+```go
+import "github.com/ayflying/utility_go/package/pay/apple"
+
+// 处理Apple支付验证
+```
+
+#### 支付宝/微信支付
+```go
+import (
+    "github.com/ayflying/utility_go/package/pay/alipay"
+    "github.com/ayflying/utility_go/package/pay/wechat"
+)
+```
+
+### 🏆 排名模块 (package/rank)
+
+基于Redis的高性能排行榜实现：
+
+```go
+import "github.com/ayflying/utility_go/pkg/rank"
+
+// 创建排行榜
+rankMod := rank.New()
+leaderboard := rankMod.CreateF64CountRank("season_1")
+
+// 增加分数
+curScore, err := leaderboard.IncrScore(userID, 100)
+
+// 设置分数
+err := leaderboard.SetScore(userID, 500)
+
+// 获取排名信息
+rankInfo, err := leaderboard.GetRankInfosNotTs(0, 10)
+```
+
+### 💾 缓存模块 (package/aycache)
+
+```go
+import "github.com/ayflying/utility_go/package/aycache"
+
+// 使用缓存
+cache := aycache.New()
+```
+
+### 📊 数据库操作
+
+#### Elasticsearch
+```go
+import "github.com/ayflying/utility_go/package/elasticsearch"
+
+// ES操作
+```
+
+#### MySQL (基于GoFrame)
+```go
+import "github.com/gogf/gf/v2/database/gdb"
+```
+
+### 🔄 定时任务 (systemCron)
+
+```go
+import "github.com/ayflying/utility_go/service"
+
+// 添加定时任务
+service.SystemCron().AddCronV2(v1.CronType_HOUR, func(ctx context.Context) error {
+    // 执行任务
+    return nil
+}, true)
+```
+
+### 📝 日志管理 (systemLog)
+
+```go
+import "github.com/ayflying/utility_go/service"
+
+// 记录日志
+service.SystemLog().Info("操作成功")
+service.SystemLog().Error("操作失败: %v", err)
+```
+
+### 🌐 IP地理位置查询 (ip2region)
+
+```go
+import "github.com/ayflying/utility_go/service"
+
+// 查询IP位置
+ipInfo, err := service.Ip2Region().Search("192.168.1.1")
+```
+
+### 📁 S3存储 (s3)
+
+```go
+import "github.com/ayflying/utility_go/package/s3"
+
+// 列出存储桶
+buckets, err := s3.ListBuckets()
+
+// 上传文件
+err := s3.UploadFile("bucket-name", "file-key", fileData)
+```
+
+### 📑 Excel处理 (excel)
+
+```go
+import "github.com/ayflying/utility_go/package/excel"
+
+// 读取Excel
+data, err := excel.Read("file.xlsx")
+
+// 导出Excel
+err := excel.Export(data, "output.xlsx")
+```
+
+## 🛠️ 配置管理
+
+项目使用GoFrame框架的配置管理：
+
+```go
+import (
+    "github.com/ayflying/utility_go/config"
+    "github.com/gogf/gf/v2/frame/g"
+)
+
+// 获取配置
+cfg := config.Cfg{}
+dbConfig := g.Cfg().Get("database")
+```
+
+## 🔧 工具函数
+
+### 时间处理 (tools/time.go)
+```go
+import "github.com/ayflying/utility_go/tools"
+
+// 获取本周开始时间
+weekStart := tools.GetWeekStart()
+
+// 计算天数差
+days := tools.DiffDays(startTime, endTime)
+```
+
+### Redis操作 (tools/redis.go)
+```go
+// 批量获取数据
+data, err := tools.ScanRedis(pattern)
+```
+
+### 通用工具 (tools/tools.go)
+```go
+// 字符串转道具类型
+items := tools.Tools.Spilt2Item("1|10|2|20")
+
+// 切片转道具类型
+items := tools.Tools.Slice2Item([]int64{1, 10, 2, 20})
+
+// 道具格式转Map
+itemMap := tools.Tools.Items2Map(items)
+```
+
+## 🎯 使用示例
+
+### 完整的支付验证流程
 ```go
 package main
 
@@ -82,78 +313,107 @@ import (
 )
 
 func main() {
-    // 初始化参数
-    purchaseData := "your_purchase_data"
-    signature := "your_signature"
-
-    // 验证签名
-    err := playstore.VerifySignature(purchaseData, signature)
+    // Google Play Store应用内购买验证
+    purchaseData := "purchase_data_string"
+    signature := "signature_string"
+    publicKey := "base64_encoded_public_key"
+    
+    isValid, err := playstore.VerifySignature(publicKey, []byte(purchaseData), signature)
     if err != nil {
-        fmt.Println("Signature verification failed:", err)
+        fmt.Println("验证失败:", err)
         return
     }
-
-    fmt.Println("Signature verification succeeded")
+    
+    if isValid {
+        fmt.Println("支付验证成功")
+    }
 }
 ```
 
-### 5.2 S3模块示例
-以下是一个使用 `s3` 模块列出S3存储桶信息的示例代码：
+### 排行榜使用示例
 ```go
 package main
 
 import (
     "fmt"
-    "github.com/ayflying/utility_go/package/s3"
+    "github.com/ayflying/utility_go/pkg/rank"
 )
 
 func main() {
-    // 列出S3存储桶信息
-    buckets, err := s3.ListBuckets()
+    rankMod := rank.New()
+    leaderboard := rankMod.CreateF64CountRank("game_season_1")
+    
+    // 用户得分
+    score, err := leaderboard.IncrScore(1001, 50)
     if err != nil {
-        fmt.Println("Failed to list buckets:", err)
+        fmt.Println("更新分数失败:", err)
         return
     }
-
-    for _, bucket := range buckets {
-        fmt.Println("Bucket name:", bucket.Name)
+    
+    fmt.Printf("当前分数: %.0f\n", score)
+    
+    // 获取前10名
+    top10, err := leaderboard.GetRankInfosNotTs(0, 9)
+    if err != nil {
+        fmt.Println("获取排名失败:", err)
+        return
+    }
+    
+    for i, info := range top10 {
+        fmt.Printf("第%d名: 用户%d - 分数%d\n", i+1, info.Id, info.Score)
     }
 }
 ```
 
-### 5.3 工具模块示例
-以下是一个使用 `tools` 模块处理道具数据的示例代码：
-```go
-package main
+## ⚙️ 开发指南
 
-import (
-    "fmt"
-    "github.com/ayflying/utility_go/tools"
-)
+### 代码规范
+- 使用GoFrame框架的最佳实践
+- 遵循Go语言命名规范
+- 添加必要的注释和文档
+- 使用错误处理和日志记录
 
-func main() {
-    // 字符串转道具类型
-    str := "1|10|2|20"
-    result := tools.Tools.Spilt2Item(str)
-    fmt.Println("Spilt2Item result:", result)
+### 项目启动流程
+1. 配置文件加载
+2. 数据库连接初始化
+3. 缓存系统初始化
+4. 定时任务注册
+5. 服务启动监听
 
-    // 切片换道具类型
-    slice := []int64{1, 10, 2, 20}
-    res := tools.Tools.Slice2Item(slice)
-    fmt.Println("Slice2Item result:", res)
+### 注意事项
+- ⚠️ **自动生成文件**: 使用CLI工具生成的文件包含 `// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.` 注释，请勿手动修改
+- 🔒 **版本兼容性**: 建议使用Go 1.24+版本
+- 📦 **依赖管理**: 使用go mod管理依赖
 
-    // 道具格式转map
-    list := tools.Tools.Items2Map(result)
-    fmt.Println("Items2Map result:", list)
-}
-```
+## 🔄 更新维护
 
-## 六、注意事项
-- **自动生成文件**：项目中有部分代码文件是由GoFrame CLI工具生成并维护的，这些文件通常会标注有 `// Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.` 注释。请不要手动修改这些文件，以免造成不必要的问题。
-- **版本兼容性**：在使用 `utility_go` 工具类库时，请确保你的Go语言版本与工具类库的要求版本兼容。建议使用最新的Go语言版本，以获得更好的性能和稳定性。
+- **定期更新**: 修复已知问题，添加新功能
+- **性能优化**: 持续优化性能表现
+- **安全补丁**: 及时修复安全漏洞
 
-## 七、更新和维护
-`utility_go` 工具类库会定期进行更新和维护，以修复已知的问题、添加新的功能和优化性能。你可以关注项目的GitHub仓库（https://github.com/ayflying/utility_go）获取最新的更新信息。如果你在使用过程中遇到任何问题或有任何建议，欢迎提交Issue或Pull Request。
+## 📄 许可证
 
-## 八、许可证信息
-`utility_go` 工具类库遵循MIT许可证，你可以在项目的 `LICENSE` 文件中查看详细的许可证条款。请确保在使用该工具类库时遵守相关的许可证规定。
+本项目采用 [MIT License](LICENSE) 许可证。
+
+## 🤝 贡献指南
+
+欢迎提交Issue和Pull Request来贡献代码！
+
+1. Fork本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启Pull Request
+
+## 📞 联系方式
+
+- **GitHub**: https://github.com/ayflying/utility_go
+- **Gitee**: https://gitea.adesk.com/public_project/utility_go
+
+## 🙏 致谢
+
+感谢所有贡献者和开源社区的支持！
+
+---
+
+**utility_go** © 2025 - Made with ❤️ by [ayflying]

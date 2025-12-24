@@ -34,7 +34,7 @@ func (m DingTalkMod) Send(value string) {
 	}
 
 	// 构建发送的消息体，包含消息类型和内容
-	_, err := g.Client().Discovery(nil).ContentJson().Post(ctx, url, post)
+	_, err := g.Client().ContentJson().Post(ctx, url, post)
 	if err != nil {
 		g.Log().Info(ctx, err)
 	}

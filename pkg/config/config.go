@@ -118,7 +118,7 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 	// 拼接远程配置文件的 URL
 	urlStr := fmt.Sprintf("http://sdf.sdfs.sdf/%s.json", name)
 	// 发送 HTTP 请求获取远程配置数据
-	getUrl, err := g.Client().Discovery(nil).Get(nil, urlStr)
+	getUrl, err := g.Client().Get(nil, urlStr)
 	// 读取响应内容
 	bytes := getUrl.ReadAll()
 	// 解析 JSON 内容并返回结果

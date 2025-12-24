@@ -73,9 +73,7 @@ var (
 			//filename := "linux_amd64/" + Filename
 			//filename := path.Join(Version, "linux_amd64", Filename)
 
-			client := g.Client()
-			client.SetTimeout(time.Minute)
-			client.SetDiscovery(nil)
+			client := g.Client().SetTimeout(time.Minute)
 
 			//循环服务器，推送更新
 			for _, v := range list {

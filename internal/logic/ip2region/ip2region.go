@@ -71,7 +71,7 @@ func (s *sIp2region) Load(t *xdb.Version) {
 		}()
 		g.Log().Debug(ctx, "等待下载ip库文件")
 		//下载文件
-		putData, err2 := g.Client().Discovery(nil).Get(ctx, url)
+		putData, err2 := g.Client().Get(ctx, url)
 		if err2 != nil {
 			return
 		}

@@ -26,7 +26,7 @@ func (s *sSystemCron) Guardian(DingTalkWebHook string) {
 	cfg, _ := g.Cfg().Get(gctx.New(), "serverList")
 	cfg.Scan(&list)
 	for _, v := range list {
-		get, err := g.Client().Discovery(nil).Get(gctx.New(), v.Address+"/callback/status")
+		get, err := g.Client().Get(gctx.New(), v.Address+"/callback/status")
 
 		defer get.Close()
 		if err != nil {
