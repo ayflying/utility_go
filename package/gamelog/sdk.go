@@ -312,6 +312,9 @@ const datetimeFmt = time.DateOnly + " " + time.TimeOnly
 
 // 记录日志
 func (sdk *SDK) Log(uid, event string, property map[string]any, timezone string, customEventTime ...time.Time) {
+	if g.Cfg().MustGet(ctx, "debug").Bool() {
+		return
+	}
 	loc := time.Local
 	if _loc := getLocationMapValue(timezone); _loc != nil {
 		loc = _loc
