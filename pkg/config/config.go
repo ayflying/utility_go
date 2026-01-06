@@ -1,7 +1,10 @@
 package config
 
 import (
+	"context"
 	"fmt"
+	"sync"
+
 	"github.com/apolloconfig/agollo/v4"
 	apolloConfig "github.com/apolloconfig/agollo/v4/env/config"
 	"github.com/apolloconfig/agollo/v4/storage"
@@ -9,11 +12,15 @@ import (
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gcfg"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/gres"
 	"github.com/gogf/gf/v2/text/gstr"
-	"sync"
+
+	"github.com/gogf/gf/contrib/config/consul/v2"
+	"github.com/hashicorp/consul/api"
+	"github.com/hashicorp/go-cleanhttp"
 )
 
 var (
@@ -23,6 +30,8 @@ var (
 	ApolloListener []string
 	// Item2Obj 存储配置项名称和对应的加载器对象的映射
 	Item2Obj = map[string]Load{}
+
+	ConsulIsWatcher = map[string]bool{}
 )
 
 // Load 接口定义了 Load 方法，用于加载数据
@@ -123,6 +132,51 @@ func (c *Cfg) GetUrlFile(name string) (jsonObj *gjson.Json, err error) {
 	bytes := getUrl.ReadAll()
 	// 解析 JSON 内容并返回结果
 	jsonObj, err = gjson.DecodeToJson(bytes)
+	return
+}
+
+func (c *Cfg) GetConsul(name string, obj Load) (jsonObj *gjson.Json, err error) {
+	ctx := gctx.New()
+	// 加载在线配置
+	getCfg := g.Cfg().MustGet(ctx, "cfg")
+	if getCfg.IsNil() {
+		return
+	}
+	g.Log().Info(ctx, " - 初始化consul在线配置")
+	var cfg = getCfg.MapStrStr()
+	var consulConfig = api.Config{
+		Address:    cfg["address"],                     // Consul server address
+		Scheme:     "http",                             // Connection scheme (http/https)
+		Datacenter: "dc1",                              // Datacenter name
+		Transport:  cleanhttp.DefaultPooledTransport(), // HTTP transport with connection pooling
+		Token:      cfg["token"],                       // ACL token for authentication
+	}
+	var configPath = name + ".json"
+
+	adapter, err := consul.New(ctx, consul.Config{
+		ConsulConfig: consulConfig, // Consul client configuration
+		Path:         configPath,   // Configuration path in KV store
+		Watch:        true,         // Enable configuration watching for updates
+	})
+	// 更改默认配置实例的适配器
+	g.Cfg(name).SetAdapter(adapter)
+
+	getCfg, err = g.Cfg(name).Get(nil, ".")
+	// 将配置值扫描到 jsonObj 中
+	getCfg.Scan(&jsonObj)
+
+	// 添加观察者到配置实例的适配器
+	if ok, _ := ConsulIsWatcher[name]; !ok {
+		if adapter2, ok2 := g.Cfg(name).GetAdapter().(gcfg.WatcherAdapter); ok2 {
+			ConsulIsWatcher[name] = true
+			adapter2.AddWatcher("config-watcher", func(ctx context.Context) {
+				fmt.Println("配置发生了变化")
+				//cfg3 := g.Cfg(name).MustGet(ctx, ".")
+				obj.Load()
+			})
+		}
+	}
+
 	return
 }
 
